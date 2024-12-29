@@ -5,6 +5,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.geometry.VPos;
+import javafx.scene.image.Image; // to add assets
 
 /** MyCanvas - Is a utility class for drawing on a JavaFX canvas.
  * It will provide methods to render shapes, clear the canvas, and display text.
@@ -103,6 +104,19 @@ public class MyCanvas {
 	 */
 	public int getCanvasHeight() {
 		return yCanvasSize; // returns height of canvas
+	}
+	
+	/** Method drawIamge - Draws an image on the canvas at a sepcified position
+	 * With a specified size
+	 * 
+	 * @param image - The image object to draw
+	 * @param x - x-coordinate for the top-left corner of the image
+	 * @param y - y-coordinate for the top-left corner of the image
+	 * @param width - The width to draw the image
+	 * @param height - The height to draw the image
+	 */
+	public void drawImage(Image image, double x, double y, double width, double height) {
+		gc.drawImage(image, x, y, width, height); // draw the image with specified parameters
 	}
 	
 	

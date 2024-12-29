@@ -1,20 +1,25 @@
 package robotSimGUI;
 
-import javafx.scene.paint.Color;
+import javafx.scene.image.Image; // to add assets
 
 /** Robot - Represents a moving Robot in the RobotArena
- * Inherits from ArenaItem
+ * Inherits from ArenaItem and supports animated frames
  */
 public class Robot extends ArenaItem {
 	private double dx; // x-direction of movement
 	private double dy; // y-direction of movement
 	private double speed; // speed multiplier
 	private RobotArena arena; // reference to the RobotArena instance
+	private Image[] frames; // array to store animation frames
+	private int currentFrameIndex; // index to track the current frame
+	private long lastFrameTime; // time when the last frame was updated
+	private static final long FRAME_DURATION = 200_000_000; // duration of each frame in nanoseconds
 	
 	
 	
 	/** Constructor for Robot
 	 * Initialises the robot with position and size and consistent movement speed
+	 * Loads the animation frames and sets the initial direction 
 	 * 
 	 * @param xPosition - x-coordinate of the robot
 	 * @param yPosition - y-coordinate of the robot
@@ -29,24 +34,30 @@ public class Robot extends ArenaItem {
 		double randomAngle = Math.random() * 2 * Math.PI; // random angle in radians
 		this.dx = Math.cos(randomAngle) * speed; // random x-direction between -1 and 1
 		this.dy = Math.sin(randomAngle) * speed; // random y-direction between -1 and 1
-	}
-
-	/** Method to draw the robot
-	 * Currently draws robot as a blue circle
-	 * 
-	 */
-	@Override
-	public void draw(MyCanvas canvas) {
-		// Draw as a blue circle
-		canvas.drawCircle(getXPosition(), getYPosition(), getRadius(), Color.BLUE);
+	
+		// Load animation frames
+		frames = new Image[] {
+			    new Image("file:src/robotSimGUI/Assets/basicRobotFrame1.png"),
+			    new Image("file:src/robotSimGUI/Assets/basicRobotFrame2.png"),
+			    new Image("file:src/robotSimGUI/Assets/basicRobotFrame3.png")
+		};
+		currentFrameIndex = 0; // start with the first frame
+		lastFrameTime = System.nanoTime(); // initialise the last frame
 	}
 	
-	/** Method update - to update the robot's position based on movement direction
+	/** Method update - to update the robot's position based on movement direction and handles animation frame
 	 * Ensure that the robot stays with the boundaries of the arena and handles collisions
 	 * 
 	 */
 	@Override
 	public void update() {
+		long currentTime = System.nanoTime(); // current time in nanoseconds
+		// Update the animation frame based on how much time has elapsed
+		if (currentTime - lastFrameTime >= FRAME_DURATION) {
+			currentFrameIndex = (currentFrameIndex + 1) % frames.length; // loop through the three frames
+			lastFrameTime = currentTime; // reset the frame time
+		}
+		
 		// Update the position
 		double newX = getXPosition() + dx; // new x-coordinate
 		double newY = getYPosition() + dy; // new y-coordinate
@@ -80,6 +91,24 @@ public class Robot extends ArenaItem {
 		
 		// Set the new position 
 		setPosition(newX, newY);
+	}
+	
+	
+	/** Method to draw the robot
+	 * Displays the current animation frame
+	 * 
+	 * @param canvas - MyCanvas instance for drawing
+	 * 
+	 */
+	@Override
+	public void draw(MyCanvas canvas) {
+		// Draw the current animation frame
+		canvas.drawImage(
+		frames[currentFrameIndex],
+		getXPosition() - getRadius(),
+		getYPosition() - getRadius(),
+		getRadius() * 3, // for height
+		getRadius() * 3); // for width
 	}
 	
 	/** Method setPosition - Updates the robot's position
