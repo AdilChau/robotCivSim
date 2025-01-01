@@ -119,5 +119,34 @@ public class MyCanvas {
 		gc.drawImage(image, x, y, width, height); // draw the image with specified parameters
 	}
 	
+	/** Method save - Saves the current state of the GraphicsContext
+	 * 
+	 */
+	public void save() {
+		gc.save();
+	}
 	
+	/** Method restore - Restores the previous state of the GraphicsContext
+	 * 
+	 */
+	public void restore() {
+		gc.restore();
+	}
+	
+	/** Method Translate - Translates the origin of the GraphicsContext to a new position
+	 * 
+	 * @param x - New x-coordinate for the origin
+	 * @param y - New y-coordinate for the origin
+	 */
+	public void translate(double x, double y) {
+		gc.translate(x, y);
+	}
+	
+	/** Method Rotate - Rotates the GraphicsContext
+	 * 
+	 * @param angle - Angle of rotation in degrees
+	 */
+	public void rotate(double angle) {
+		gc.rotate(angle);
+	}
 }

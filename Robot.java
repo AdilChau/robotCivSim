@@ -77,17 +77,15 @@ public class Robot extends ArenaItem {
 		}
 		
 		// Logic to "bounce" of walls
-		if (newX < getRadius() || newX > 800 - getRadius()) { // reverse the x-direction if either condition is met
+		if (newX < getRadius() || newX > arena.getWidth() - getRadius()) { // reverse the x-direction if either condition is met
 			dx = -dx; // reverse the x-direction on hitting the left or right boundary
+			newX = Math.max(getRadius(), Math.min(newX, arena.getWidth() - getRadius()));
 		}
 		
-		if (newY < getRadius() || newY > 600 - getRadius()) { // reverse the y-direction if either condition is met
+		if (newY < getRadius() || newY > arena.getHeight() - getRadius()) { // reverse the y-direction if either condition is met
 			dy = -dy; // reverse the y-direction on hitting a top or bottom boundary
+			newY = Math.max(getRadius(), Math.min(newY, arena.getHeight() - getRadius()));
 		}
-		
-		// Apply the new position
-		newX = Math.max(getRadius(), Math.min(newX, 800 - getRadius())); // ensure x-coordinates within bounds
-		newY = Math.max(getRadius(), Math.min(newY, 600 - getRadius())); // ensure y-coordinates within bounds
 		
 		// Set the new position 
 		setPosition(newX, newY);
@@ -96,21 +94,38 @@ public class Robot extends ArenaItem {
 	
 	/** Method to draw the robot
 	 * Displays the current animation frame
+	 * Calculates angle to ensure assets face the direction they are moving
 	 * 
 	 * @param canvas - MyCanvas instance for drawing
 	 * 
 	 */
 	@Override
 	public void draw(MyCanvas canvas) {
+		// Calculate the rotation angle in degrees
+		double angle = Math.toDegrees(Math.atan2(dy, dx));	
+		
+		// Save the current state of the GraphicsContext
+		canvas.save();
+		
+		// Translate the robot's position
+		canvas.translate(getXPosition(), getYPosition());
+		
+		// Rotate the GraphicsContedxt to the calculated angle
+		canvas.rotate(angle);
+		
 		// Draw the current animation frame
 		canvas.drawImage(
 		frames[currentFrameIndex],
-		getXPosition() - getRadius(),
-		getYPosition() - getRadius(),
-		getRadius() * 3, // for height
-		getRadius() * 3); // for width
-	}
+		-getRadius() * 1.5, // centering the image horizontally
+		-getRadius() * 1.5, // centering the image vertically
+		getRadius() * 3, // scaled for height
+		getRadius() * 3); // scaled for width
 	
+	
+		// Restore the original state of the GraphicsContext
+		canvas.restore();
+	
+	}
 	/** Method setPosition - Updates the robot's position
 	 * This method is used to set the private xPosition and yPosition
 	 * Reflection is used to modify the private fields securely
