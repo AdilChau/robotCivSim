@@ -13,6 +13,8 @@ import javafx.scene.control.Button; // import button
 import javafx.scene.control.ToolBar; // import toolbar
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javafx.scene.layout.VBox; // for VBox layout
+import javafx.geometry.Pos; // for alignment options
 
 /** SimulationGUI - Is the Main GUI class for the robot simulation.
  * It extends JavaFX Application to create and manage the GUI.
@@ -32,7 +34,7 @@ public class SimulationGUI extends Application {
 		arena = new RobotArena(800, 600);
 		
 		// Add sample items for testing
-		arena.addItem(new Obstacle(200, 200, 30)); // add an obstacle
+		arena.addItem(new Obstacle(200, 200, 30, "tree")); // add an obstacle
 		arena.addItem(new Robot(400, 300, 20, arena)); // add a robot
 		
 		// Set up the GUI Layout
@@ -113,7 +115,7 @@ public class SimulationGUI extends Application {
 		
 		// Set up the button actions
 		addRobotButton.setOnAction(e -> addRobot()); // allows addRobot button to have an action
-		addObstacleButton.setOnAction(e -> addObstacle()); // allows addObstacle button to have an action
+		addObstacleButton.setOnAction(e -> showObstacleMenu()); // opens obstacle selection menu
 		
 		// Add buttons to the toolbar
 		ToolBar toolBar = new ToolBar(addRobotButton, addObstacleButton);
@@ -127,8 +129,8 @@ public class SimulationGUI extends Application {
 	private void addRobot() {
 		double x, y; // initialise x and y coordinates
 		do {
-			x = Math.random() * 800; // random x-coordinate
-			y = Math.random() * 600; // random y-coordiante		
+			x = 30 + Math.random() * (800 - 60); // random x-coordinate (ensures it fits within boundaries)
+			y = 30 + Math.random() * (600 - 60); // random y-coordiante	 (ensures it fits within boundaries)
 		} while (arena.checkOverlap(x, y, 20)); // check for overlap
 		
 		
@@ -137,21 +139,60 @@ public class SimulationGUI extends Application {
 		arena.drawArena(canvas); // redraw he arena
 	}
 	
-	/** Method addObstacle - adds an obstacle to the arena without overlapping any existing items
-	 * Then redraws the canvas
-	 * 
+	/** Method showObstacleMenu - Displays a popup  menu to choose obstacle type
+	 * It Allows for the user to select a specific obstacle to add out of available options (e.g., Tree, Rock)
 	 */
-	private void addObstacle() {
+	private void showObstacleMenu() {
+		// Create a new stage for the popup
+		Stage dialog = new Stage(); 
+		dialog.setTitle("Select Obstacle"); // add title
+		
+		// Create the buttons for each type
+		Button treeButton = new Button("Tree"); // tree button
+		Button rockButton = new Button("Rock"); // rock button
+		
+		// Set up actions for each button
+		treeButton.setOnAction(e -> {
+			addSpecificObstacle("tree"); // add tree using addSpecificObstacle method
+			dialog.close(); // close the dialog after selection
+		});
+		
+		rockButton.setOnAction(e -> {
+			addSpecificObstacle("rock"); //add rock using addSpecificObstacle method
+			dialog.close(); // close the dialog after selection
+		});
+		
+		// Layout for the buttons
+		VBox layout = new VBox(10, treeButton, rockButton); // vertical box layout with spacing 
+		layout.setAlignment(Pos.CENTER); // center align the buttons
+		Scene scene = new Scene(layout, 200, 150); // create the scene with specified size
+		dialog.setScene(scene);
+		dialog.showAndWait(); // show the dialog and wait for the user interaction
+	}
+	
+	/** Method addSpecificObstacle - Adds a specific obstacle to the arena
+	 * Based on the type passed as a parameter
+	 * Ensures there is no overlap with existing items
+	 * 
+	 * @param type - The type of obstacle to add (e.g., "tree" or "rock")
+	 */
+	private void addSpecificObstacle(String type) {
 		double x, y; // initialise x and y coordinates
 		do {
-			x = Math.random() * 800; // random x-coordinate
-			y = Math.random() * 600; // random y-coordiante		
-		} while (arena.checkOverlap(x, y, 30)); // check for overlap
+			x = 30 + Math.random() * (800 - 60); // random x-coordiante (ensures it fits within boundaries)
+			y = 30 + Math.random() * (600 - 60); // random y-coordinate (ensures it fits within boundaries)
+		} while (arena.checkOverlap(x, y, 30)); // check for overlap with existing items
 		
-		// Add an obstacle at a determined position with a radius of 30
-		arena.addItem(new Obstacle(x, y, 30)); // use the validated coordinates
-		arena.drawArena(canvas); // redraw he arena
+		// Add the appropriate obstacle based on the type
+		if (type.equals("tree")) {
+			arena.addItem(new Obstacle(x, y, 30, "tree"));
+		} else if (type.equals("rock")) {
+			arena.addItem(new Obstacle(x, y, 30, "rock"));
+		}
+		
+		arena.drawArena(canvas); // redraw the arena
 	}
+	
 	
 	/**
 	 * Main method to launch the application.
