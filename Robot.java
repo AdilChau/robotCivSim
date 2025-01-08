@@ -39,7 +39,8 @@ public class Robot extends ArenaItem {
 		frames = new Image[] {
 			    new Image("file:src/robotSimGUI/Assets/basicRobotFrame1.png"),
 			    new Image("file:src/robotSimGUI/Assets/basicRobotFrame2.png"),
-			    new Image("file:src/robotSimGUI/Assets/basicRobotFrame3.png")
+			    new Image("file:src/robotSimGUI/Assets/basicRobotFrame3.png"),
+			    new Image("file:src/robotSimGUI/Assets/basicRobotFrame4.png")
 		};
 		currentFrameIndex = 0; // start with the first frame
 		lastFrameTime = System.nanoTime(); // initialise the last frame
