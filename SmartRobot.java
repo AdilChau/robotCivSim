@@ -93,29 +93,18 @@ public class SmartRobot extends Robot {
 			}
 		}
 		
-		// Check for boundaries as a list of virtual points
-		List<double[]> boundaryPoints = new ArrayList<>(); 
-		
-		// Add points along the left and right boundaries
-		for (double y = 0; y <= arena.getHeight(); y += 10) { 
-			boundaryPoints.add(new double[] {0, y}); // left boundary
-			boundaryPoints.add(new double[] {arena.getWidth(), y}); // right boundary
-		}
-		
-		// Loop through the list of points
-		for(double[] point : boundaryPoints) {
-			double dx = point[0] - getXPosition();
-			double dy = point[1] - getYPosition();
-			double distance = Math.sqrt(dx * dx + dy * dy);
+		// Check for boundaries with the light beam area
+		for (double angle = -sensorAngle / 2; angle <= sensorAngle / 2; angle += 5) { // increment by 5 degrees
+			// Calculate the position of the edge point of the beam at this angle
+			double beamX = getXPosition() + sensorRange * Math.cos(Math.toRadians(angle + Math.toDegrees(Math.atan2(dy, dx))));
+			double beamY = getYPosition() + sensorRange * Math.sin(Math.toRadians(angle + Math.toDegrees(Math.atan2(dy, dx))));
 			
-			if (distance <= sensorRange && isWithinSensorAngle(dx, dy)) {
-				lightBeamColor = Color.RED; // change beam colour to red
-				
-				// Reverse direction to "bounce" of the wall
-				this.dx = -this.dx; // reverse x direction to avoid collision
-				this.dy = -this.dy; // reverse y direction to avoid collision
-				
-				break; // stop checking further after detecting a boundary
+			// Check if the beam edge point is outside the arena boundaries
+			if (beamX < 0 || beamX > arena.getWidth() || beamY < 0 || beamY > arena.getHeight()) {
+				lightBeamColor = Color.RED; // Change beam colour to red
+				this.dx = -this.dx; // reverse the x-direction
+				this.dy = -this.dy; // reverse the y-direction
+				break; // stop further checks
 			}
 		}
 	}
