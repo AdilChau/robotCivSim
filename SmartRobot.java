@@ -1,5 +1,8 @@
 package robotSimGUI;
 
+import java.util.ArrayList; // for boundary points
+import java.util.List; // for boundary points
+
 import javafx.scene.paint.Color; // For drawing the light beam
 import javafx.scene.shape.ArcType; // Import ArcType for drawing rounded arcs
 
@@ -22,7 +25,7 @@ public class SmartRobot extends Robot {
 	 */
 	public SmartRobot(double xPosition, double yPosition, double radius, RobotArena arena) {
 		super(xPosition, yPosition, radius, arena); // calls robot parent instructor
-		this.sensorRange = 150; // default sensor range set to 150
+		this.sensorRange = 150;// default sensor range set to 150
 		this.sensorAngle = 60; // default sensor angle set to 60 degrees
 		this.lightBeamColor = Color.YELLOW; // default light beam colour set to yellow
 	}
@@ -90,11 +93,30 @@ public class SmartRobot extends Robot {
 			}
 		}
 		
-		// Check for boundaries
-		if (getXPosition() - getRadius() < 0 || getXPosition() + getRadius() > arena.getWidth() || getYPosition() - getRadius() < 0 || getYPosition() + getRadius() > arena.getHeight()) {
-			lightBeamColor = Color.RED; // Change beam colour to red 
-			dx = -dx; // Reverse direction 
-			dy = -dy; 
+		// Check for boundaries as a list of virtual points
+		List<double[]> boundaryPoints = new ArrayList<>(); 
+		
+		// Add points along the left and right boundaries
+		for (double y = 0; y <= arena.getHeight(); y += 10) { 
+			boundaryPoints.add(new double[] {0, y}); // left boundary
+			boundaryPoints.add(new double[] {arena.getWidth(), y}); // right boundary
+		}
+		
+		// Loop through the list of points
+		for(double[] point : boundaryPoints) {
+			double dx = point[0] - getXPosition();
+			double dy = point[1] - getYPosition();
+			double distance = Math.sqrt(dx * dx + dy * dy);
+			
+			if (distance <= sensorRange && isWithinSensorAngle(dx, dy)) {
+				lightBeamColor = Color.RED; // change beam colour to red
+				
+				// Reverse direction to "bounce" of the wall
+				this.dx = -this.dx; // reverse x direction to avoid collision
+				this.dy = -this.dy; // reverse y direction to avoid collision
+				
+				break; // stop checking further after detecting a boundary
+			}
 		}
 	}
 	
@@ -107,7 +129,16 @@ public class SmartRobot extends Robot {
 	private boolean isWithinSensorAngle(double dx, double dy) {
 		double angleToItem = Math.toDegrees(Math.atan2(dy, dx)); // calculate angle to the item
 		double robotAngle = Math.toDegrees(Math.atan2(this.dy, this.dx)); // calculate the robot's current angle
+		
+		// Normalise angles to the range [0, 360]
+		angleToItem = (angleToItem + 360) % 360;
+		robotAngle = (robotAngle + 360) % 360;
+		
 		double relativeAngle = Math.abs(angleToItem - robotAngle); // calculate the relative angle
+		if (relativeAngle > 180) {
+			relativeAngle = 360 - relativeAngle; // adjust for angles over 180 degrees
+		}
+		
 		return relativeAngle <= sensorAngle / 2; // check if the relative angle is within the sensor's range
 	}
 	
