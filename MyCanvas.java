@@ -6,6 +6,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.geometry.VPos;
 import javafx.scene.image.Image; // to add assets
+import javafx.scene.shape.ArcType; // Import ArcType for drawing rounded arcs
+
 
 /** MyCanvas - Is a utility class for drawing on a JavaFX canvas.
  * It will provide methods to render shapes, clear the canvas, and display text.
@@ -148,5 +150,44 @@ public class MyCanvas {
 	 */
 	public void rotate(double angle) {
 		gc.rotate(angle);
+	}
+	
+	/** Method setFill - Sets the fill colour for subsequent drawing operations on the canvas
+	 * It delegates to the GraphicsContext to specify the colour usedfor filling in shapes
+	 * such as circles, rectangles, and arcs
+	 * 
+	 * @param color - the colour to be used for filling in shapes
+	 */
+	public void setFill(Color color) {
+		gc.setFill(color); // delegate to GraphicsContext
+	}
+	
+	/** Method fillArc - Draws a filled arc on the canvas with specified parameters
+	 * 
+	 * @param x - x-coordinate of the top-left corner of the arc's bounding rectangle
+	 * @param y - y-coordinate of the top-left corner of the arc's bounding rectangle
+	 * @param width - Width of the arc's bounding rectangle
+	 * @param height - Height of the arc's bounding rectangle
+	 * @param startAngle - Starting angle of the arc in degrees
+	 * @param arcExtent - Extent (sweep) of the arc in degrees
+	 * @param arcType - The type of arc (e.g., ROUND)
+	 */
+	public void fillArc(double x, double y, double width, double height, double startAngle, double arcExtent, ArcType arcType) {
+		gc.fillArc(x,  y, width, height, startAngle, arcExtent, arcType); // delegate to GraphicsContext
+	}
+	
+	/** Method drawArc - Draws an arc on the canvas with specified position, size, start angle, and extent
+	 * 
+	 * @param x - x-coordinate of the top-left corner of the arc's bounding rectangle 
+	 * @param y - y-coordinate of the top-left corner of the arc's bounding rectangle 
+	 * @param width - Width of the bounding rectangle
+	 * @param height - Height of the bounding rectangle
+	 * @param startAngle - Starting angle of the arc in degrees 
+	 * @param arcExtent - Extent (sweep) of the arc in degrees
+	 * @param fillColor - The fill colour of the arc
+	 */
+	public void drawArc(double x, double y, double width, double height, double startAngle, double arcExtent, Color fillColor) {
+		gc.setFill(fillColor); // set the fill colour
+		gc.fillArc(x,  y, width, height, startAngle, arcExtent, ArcType.ROUND); // draw arc
 	}
 }

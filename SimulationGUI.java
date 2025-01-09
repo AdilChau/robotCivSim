@@ -36,6 +36,7 @@ public class SimulationGUI extends Application {
 		// Add sample items for testing
 		arena.addItem(new Obstacle(200, 200, 30, "tree")); // add an obstacle
 		arena.addItem(new Robot(400, 300, 20, arena)); // add a robot
+		arena.addItem(new SmartRobot(100, 100, 20, arena)); // add a SmartRobot
 		
 		// Set up the GUI Layout
 		BorderPane root = new BorderPane(); // root layout for the GUI
@@ -137,6 +138,8 @@ public class SimulationGUI extends Application {
 		// Add a robot at a determined position
 		arena.addItem(new Robot(x, y, 20, arena)); // using validated coordinates
 		arena.drawArena(canvas); // redraw he arena
+
+
 	}
 	
 	/** Method showObstacleMenu - Displays a popup  menu to choose obstacle type

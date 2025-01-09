@@ -6,10 +6,10 @@ import javafx.scene.image.Image; // to add assets
  * Inherits from ArenaItem and supports animated frames
  */
 public class Robot extends ArenaItem {
-	private double dx; // x-direction of movement
-	private double dy; // y-direction of movement
-	private double speed; // speed multiplier
-	private RobotArena arena; // reference to the RobotArena instance
+	protected double dx; // x-direction of movement
+	protected double dy; // y-direction of movement
+	protected double speed; // speed multiplier
+	public RobotArena arena; // reference to the RobotArena instance
 	private Image[] frames; // array to store animation frames
 	private int currentFrameIndex; // index to track the current frame
 	private long lastFrameTime; // time when the last frame was updated
