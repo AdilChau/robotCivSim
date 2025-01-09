@@ -1,8 +1,5 @@
 package robotSimGUI;
 
-import java.util.ArrayList; // for boundary points
-import java.util.List; // for boundary points
-
 import javafx.scene.paint.Color; // For drawing the light beam
 import javafx.scene.shape.ArcType; // Import ArcType for drawing rounded arcs
 
@@ -64,7 +61,7 @@ public class SmartRobot extends Robot {
 	}
 	
 	/** Method update - Updates the smart robot's position and detection status
-	 * The robot detects nearby objects and voids them intelligently
+	 * The robot detects nearby objects and avoids them intelligently by steerimg
 	 */
 	@Override
 	public void update() {
@@ -74,7 +71,10 @@ public class SmartRobot extends Robot {
 		// Reset light beam colour to default (yellow)
 		lightBeamColor = Color.YELLOW; 
 		
-		// Check for nearby objects
+		boolean obstacleDetected = false; // tracks if an obstacle/boundary is detected
+		double steeringAngle = 0;
+		
+		// Check for nearby objects or items
 		for (ArenaItem item : arena.getItems()) {
 			// Skip itself
 			if (item == this) continue;
@@ -86,10 +86,13 @@ public class SmartRobot extends Robot {
 			
 			// Check if the item is within the sensor range and angle
 			if (distance <= sensorRange && isWithinSensorAngle(dx, dy)) {
-				// Change beam colour to red and avoid the item
-				lightBeamColor = Color.RED; // Change beam colour to red
-				avoidObject(item);
-				break; // Stop checking further after detecting an object
+				// change beam colour to red and avoid the item
+				lightBeamColor = Color.RED; // change beam colour to red
+				obstacleDetected = true; // change to true
+				
+				// Determine whether to steer left or right
+				steeringAngle = Math.toDegrees(Math.atan2(dy,  dx)) - Math.toDegrees(Math.atan2(this.dy, this.dx));
+				break; // stop checking further after detecting an object
 			}
 		}
 		
@@ -101,11 +104,23 @@ public class SmartRobot extends Robot {
 			
 			// Check if the beam edge point is outside the arena boundaries
 			if (beamX < 0 || beamX > arena.getWidth() || beamY < 0 || beamY > arena.getHeight()) {
-				lightBeamColor = Color.RED; // Change beam colour to red
-				this.dx = -this.dx; // reverse the x-direction
-				this.dy = -this.dy; // reverse the y-direction
+				lightBeamColor = Color.RED; // change beam colour to red
+				obstacleDetected = true; // change to true
+				
+				// Determine whether to steer left or right
+				steeringAngle = angle; // use the boundary angle 
 				break; // stop further checks
 			}
+		}
+		
+		// Adjust the robot's direction if an obstacle or boundary is detected
+		if(obstacleDetected) {
+			// Gradually rotate the direction of which the robot is heading
+			double currentAngle = Math.atan2(dy, dx); // current angle of movement in radians
+			double newAngle = currentAngle + Math.toRadians(steeringAngle > 0 ? 5 : -5); // rotate slightly left or right
+			
+			dx = Math.cos(newAngle) * speed; // update dx based on the new angle
+			dy = Math.sin(newAngle) * speed; // update dy based on the new angle 
 		}
 	}
 	
@@ -129,18 +144,5 @@ public class SmartRobot extends Robot {
 		}
 		
 		return relativeAngle <= sensorAngle / 2; // check if the relative angle is within the sensor's range
-	}
-	
-	/** Method avoidObject - This is another helper method to adjust direction to avoid an object
-	 * 
-	 * @param item - The ArenaItem to avoid
-	 */
-	private void avoidObject(ArenaItem item) {
-		// Adjust direction
-		double dx = getXPosition() - item.getXPosition();
-		double dy = getYPosition() - item.getYPosition();
-		double angle = Math.atan2(dy, dx);
-		this.dx = Math.cos(angle) * speed;
-		this.dy = Math.sin(angle) * speed;
 	}
 }
