@@ -73,6 +73,7 @@ public class SmartRobot extends Robot {
 		
 		boolean obstacleDetected = false; // tracks if an obstacle/boundary is detected
 		double bestSteeringAngle = 0; // best direction to steer the robot
+		double closestDistance = Double.MAX_VALUE; // keep track of the closest object
 		
 		// Check for nearby objects or items
 		for (ArenaItem item : arena.getItems()) {
@@ -90,18 +91,22 @@ public class SmartRobot extends Robot {
 				lightBeamColor = Color.RED; // change beam colour to red
 				obstacleDetected = true; // change to true
 				
-				// Calculate the steering angle to avoid the obstacle
-				double angleToItem = Math.atan2(dyToItem, dxToItem); // angle to the detected item
-				double robotAngle = Math.atan2(this.dy, this.dx); // robot's current angle
-				double relativeAngle = angleToItem - robotAngle;
-				
-				// Normalise relative angle to range [-PI, PI]
-				if (relativeAngle > Math.PI) relativeAngle -= 2 * Math.PI;
-				if (relativeAngle < -Math.PI) relativeAngle += 2 * Math.PI;
-				
-				// Steer away from the obstacle (opposite direction of relative angle)
-				bestSteeringAngle += (relativeAngle > 0 ? -10 : 10); // steer away
-				
+				// if this is the closest object, calculate the steering angle
+				if (distance < closestDistance) {
+					closestDistance = distance;
+					
+					// Calculate the steering angle to avoid the obstacle
+					double angleToItem = Math.atan2(dyToItem, dxToItem); // angle to the detected item
+					double robotAngle = Math.atan2(this.dy, this.dx); // robot's current angle
+					double relativeAngle = angleToItem - robotAngle;
+					
+					// Normalise relative angle to range [-PI, PI]
+					if (relativeAngle > Math.PI) relativeAngle -= 2 * Math.PI;
+					if (relativeAngle < -Math.PI) relativeAngle += 2 * Math.PI;
+					
+					// Steer away from the obstacle (opposite direction of relative angle)
+					bestSteeringAngle += (relativeAngle > 0 ? -10 : 10); // steer away
+				}
 			}
 		}
 		
