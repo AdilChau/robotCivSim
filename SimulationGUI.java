@@ -106,6 +106,7 @@ public class SimulationGUI extends Application {
 	}
 	
 	/** Method ToolBar - creates a toolbar with buttons for user interaction
+	 * Adds options to add robots, obstacles, and reset the canvas
 	 * 
 	 * @return ToolBar - The Created toolbar
 	 */
@@ -116,7 +117,7 @@ public class SimulationGUI extends Application {
 		Button newCanvasButton = new Button("New Canvas"); // create button to reset the canvas
 		
 		// Set up the button actions
-		addRobotButton.setOnAction(e -> addRobot()); // allows addRobot button to have an action
+		addRobotButton.setOnAction(e -> showRobotMenu()); // allows addRobot button to have an action
 		addObstacleButton.setOnAction(e -> showObstacleMenu()); // opens obstacle selection menu
 		newCanvasButton.setOnAction(e -> resetCanvas()); // reset the canvas to a blank state
 		
@@ -125,11 +126,12 @@ public class SimulationGUI extends Application {
 		return toolBar;
 	}
 	
-	/** Method addRobot - adds a robot to the arena without overlapping any existing items
-	 * Then redraws the canvas
+	/** Method addRobot - adds a robot of the specified type to the arena without overlapping any existing items
+	 * Validates the position to ensure no collisions with existing entities
 	 * 
+	 * @param type - The type of robot to add (e.g., "Basic", "Smart")
 	 */
-	private void addRobot() {
+	private void addRobot(RobotType type) {
 		double x, y; // initialise x and y coordinates
 		do {
 			x = 30 + Math.random() * (800 - 60); // random x-coordinate (ensures it fits within boundaries)
@@ -137,15 +139,52 @@ public class SimulationGUI extends Application {
 		} while (arena.checkOverlap(x, y, 20)); // check for overlap
 		
 		
-		// Add a robot at a determined position
-		arena.addItem(new Robot(x, y, 20, arena)); // using validated coordinates
-		arena.drawArena(canvas); // redraw he arena
+		// Add the specified type of robot
+		if (type == RobotType.BASIC ) {
+			arena.addItem(new Robot(x, y, 20, arena)); // add basic robot using validated coordinates
+		} else if (type == RobotType.SMART) {
+			arena.addItem(new SmartRobot(x, y, 20, arena)); // add smart robot using validated coordinates
+		}
+		
+		// Redraw the arena
+		arena.drawArena(canvas);
 
 
 	}
 	
+	/** Method showRobotMeny - Displays a popup menu to choose robot type 
+	 * It allows for the user to select a specific robot to add out of available options(e.g., Basic, Smart)
+	 */
+	public void showRobotMenu() {
+		// Create a new stage for the popup
+		Stage dialog = new Stage();
+		dialog.setTitle("Select Robot Type"); // set title
+		
+		// Create buttons for each of the robot types
+		Button basicRobotButton = new Button("Basic Robot");
+		Button smartRobotButton = new Button("Smart Robot");
+		
+		// Set up the actions of each button
+		basicRobotButton.setOnAction(e -> {
+			addRobot(RobotType.BASIC); // adds a basic robot
+			dialog.close();
+		});
+		
+		smartRobotButton.setOnAction(e -> {
+			addRobot(RobotType.SMART); // adds a smart robot
+			dialog.close();
+		});
+		
+		// Layout for the buttons
+		VBox layout = new VBox(10, basicRobotButton, smartRobotButton); // vertical box layout with spacing
+		layout.setAlignment(Pos.CENTER); // center-align the buttons 
+		Scene scene = new Scene(layout, 200, 150); // create the scene with specified size
+		dialog.setScene(scene);
+		dialog.showAndWait(); // show the dialog box and wait for user interaction
+	}
+	
 	/** Method showObstacleMenu - Displays a popup  menu to choose obstacle type
-	 * It Allows for the user to select a specific obstacle to add out of available options (e.g., Tree, Rock)
+	 * It allows for the user to select a specific obstacle to add out of available options (e.g., Tree, Rock)
 	 */
 	private void showObstacleMenu() {
 		// Create a new stage for the popup
