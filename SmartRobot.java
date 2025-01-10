@@ -1,5 +1,6 @@
 package robotSimGUI;
 
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color; // For drawing the light beam
 import javafx.scene.shape.ArcType; // Import ArcType for drawing rounded arcs
 
@@ -11,6 +12,10 @@ public class SmartRobot extends Robot {
 	private double sensorRange; // max distance the sensor can detect
 	private double sensorAngle; // angle of the light beam (e.g., 60 degrees)
 	private Color lightBeamColor;// current colour of the beam (will be yellow or red)
+	private Image[] frames; // array to store animation frames
+	private int currentFrameIndex; // index to track the current frame
+	private long lastFrameTime; // time when the last frame was updated
+	private static final long FRAME_DURATION = 200_000_000; // duration of each frame in nanoseconds
 	
 	/** Constructor for SmartRobot
 	 * This initialises the robot with position, size, movement speed, and detection capabilities
@@ -25,6 +30,16 @@ public class SmartRobot extends Robot {
 		this.sensorRange = 150;// default sensor range set to 150
 		this.sensorAngle = 60; // default sensor angle set to 60 degrees
 		this.lightBeamColor = Color.YELLOW; // default light beam colour set to yellow
+		
+		// Load animation frames for the SmartRobot
+		frames = new Image[] {
+				new Image("file:src/robotSimGUI/Assets/smartRobotFrame1.png"),
+				new Image("file:src/robotSimGUI/Assets/smartRobotFrame2.png"),
+				new Image("file:src/robotSimGUI/Assets/smartRobotFrame3.png"),
+				new Image("file:src/robotSimGUI/Assets/smartRobotFrame4.png")
+		};
+		currentFrameIndex = 0; // start with the first frame
+		lastFrameTime = System.nanoTime(); // initialise the last frame time
 	}
 	
 	/** Method draw - draws the smart robot on the canvas
@@ -43,6 +58,20 @@ public class SmartRobot extends Robot {
 		canvas.translate(getXPosition(), getYPosition());
 		double angle = Math.toDegrees(Math.atan2(dy, dx)); // calculate rotation angle
 		canvas.rotate(angle);
+		
+		// Draw the current animation frame
+		long currentTime = System.nanoTime(); // get current time
+		if (currentTime - lastFrameTime >= FRAME_DURATION) {
+			currentFrameIndex = (currentFrameIndex + 1) % frames.length; // loop through the frames
+			lastFrameTime = currentTime; // update the last frame time
+		}
+		canvas.drawImage(
+				frames[currentFrameIndex],
+				-getRadius() * 1.5, // centering the image horizontally
+				-getRadius() * 1.5, // centering the image vertically
+				getRadius() * 3, // scaled width
+				getRadius() * 3 // scaled height
+		);
 		
 		// Draw the light beam as a sector of a circle
 		canvas.setFill(lightBeamColor); // Set the colour of the beam
