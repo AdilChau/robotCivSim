@@ -13,7 +13,7 @@ public class RobotArena {
 	// Attributes for arena size and the ArrayList of items
 	private double width; // width of arena
 	private double height; // height of arena
-	protected ArrayList<ArenaItem> items; // make an ArrayList of ArenaItems
+	private ArrayList<ArenaItem> items; // make an ArrayList of ArenaItems
 	
 	/** Constructor for RobotArena 
 	 * Initialises the arena with specified dimensions and an empty list of items
