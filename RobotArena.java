@@ -101,6 +101,13 @@ public class RobotArena {
 		return false; // no overlap detected
 	}
 	
+	/** Method clearArena - This clears all the items from the arena
+	 * Effectively removing all obstacles, robots, and other entities
+	 */
+	public void clearArena() {
+		items.clear(); // clear all items from the list
+	}
+	
 }
 
  

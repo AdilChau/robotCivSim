@@ -113,13 +113,15 @@ public class SimulationGUI extends Application {
 		// Create buttons
 		Button addRobotButton = new Button("Add Robot"); // creates button to add robot
 		Button addObstacleButton = new Button("Add Obstacle"); // create button to add obstacle
+		Button newCanvasButton = new Button("New Canvas"); // create button to reset the canvas
 		
 		// Set up the button actions
 		addRobotButton.setOnAction(e -> addRobot()); // allows addRobot button to have an action
 		addObstacleButton.setOnAction(e -> showObstacleMenu()); // opens obstacle selection menu
+		newCanvasButton.setOnAction(e -> resetCanvas()); // reset the canvas to a blank state
 		
 		// Add buttons to the toolbar
-		ToolBar toolBar = new ToolBar(addRobotButton, addObstacleButton);
+		ToolBar toolBar = new ToolBar(addRobotButton, addObstacleButton, newCanvasButton);
 		return toolBar;
 	}
 	
@@ -196,6 +198,14 @@ public class SimulationGUI extends Application {
 		arena.drawArena(canvas); // redraw the arena
 	}
 	
+	
+	/** Method resetCanvas - This resets the canvas and arena to a blank state
+	 * Removes all entities from the arena and clears the canvas
+	 */
+	public void resetCanvas() {
+		arena.clearArena(); // clear all items in the arena
+		arena.drawArena(canvas); // redraw the empty arena (with borders only)
+	}
 	
 	/**
 	 * Main method to launch the application.
