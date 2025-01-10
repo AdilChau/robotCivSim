@@ -72,7 +72,7 @@ public class SmartRobot extends Robot {
 		lightBeamColor = Color.YELLOW; 
 		
 		boolean obstacleDetected = false; // tracks if an obstacle/boundary is detected
-		double steeringAngle = 0;
+		double bestSteeringAngle = 0; // best direction to steer the robot
 		
 		// Check for nearby objects or items
 		for (ArenaItem item : arena.getItems()) {
@@ -80,19 +80,28 @@ public class SmartRobot extends Robot {
 			if (item == this) continue;
 			
 			// Calculate distance to the item
-			double dx = item.getXPosition() - getXPosition();
-			double dy = item.getYPosition() - getYPosition();
-			double distance = Math.sqrt(dx * dx + dy * dy);
+			double dxToItem = item.getXPosition() - getXPosition();
+			double dyToItem = item.getYPosition() - getYPosition();
+			double distance = Math.sqrt(dxToItem * dxToItem + dyToItem * dyToItem);
 			
 			// Check if the item is within the sensor range and angle
-			if (distance <= sensorRange && isWithinSensorAngle(dx, dy)) {
+			if (distance <= sensorRange && isWithinSensorAngle(dxToItem, dyToItem)) {
 				// change beam colour to red and avoid the item
 				lightBeamColor = Color.RED; // change beam colour to red
 				obstacleDetected = true; // change to true
 				
-				// Determine whether to steer left or right
-				steeringAngle = Math.toDegrees(Math.atan2(dy,  dx)) - Math.toDegrees(Math.atan2(this.dy, this.dx));
-				break; // stop checking further after detecting an object
+				// Calculate the steering angle to avoid the obstacle
+				double angleToItem = Math.atan2(dyToItem, dxToItem); // angle to the detected item
+				double robotAngle = Math.atan2(this.dy, this.dx); // robot's current angle
+				double relativeAngle = angleToItem - robotAngle;
+				
+				// Normalise relative angle to range [-PI, PI]
+				if (relativeAngle > Math.PI) relativeAngle -= 2 * Math.PI;
+				if (relativeAngle < -Math.PI) relativeAngle += 2 * Math.PI;
+				
+				// Steer away from the obstacle (opposite direction of relative angle)
+				bestSteeringAngle += (relativeAngle > 0 ? -10 : 10); // steer away
+				
 			}
 		}
 		
@@ -107,9 +116,9 @@ public class SmartRobot extends Robot {
 				lightBeamColor = Color.RED; // change beam colour to red
 				obstacleDetected = true; // change to true
 				
-				// Determine whether to steer left or right
-				steeringAngle = angle; // use the boundary angle 
-				break; // stop further checks
+				// Steer away from the obstacle (opposite direction of relative angle)
+				bestSteeringAngle += (angle > 0 ? -10 : 10); // steer away
+				
 			}
 		}
 		
@@ -117,7 +126,7 @@ public class SmartRobot extends Robot {
 		if(obstacleDetected) {
 			// Gradually rotate the direction of which the robot is heading
 			double currentAngle = Math.atan2(dy, dx); // current angle of movement in radians
-			double newAngle = currentAngle + Math.toRadians(steeringAngle > 0 ? 5 : -5); // rotate slightly left or right
+			double newAngle = currentAngle + Math.toRadians(bestSteeringAngle / 2); // adjust by half of the best angle
 			
 			dx = Math.cos(newAngle) * speed; // update dx based on the new angle
 			dy = Math.sin(newAngle) * speed; // update dy based on the new angle 
@@ -136,7 +145,7 @@ public class SmartRobot extends Robot {
 		
 		// Normalise angles to the range [0, 360]
 		angleToItem = (angleToItem + 360) % 360;
-		robotAngle = (robotAngle + 360) % 360;
+		robotAngle = (robotAngle + 360) % 360;	
 		
 		double relativeAngle = Math.abs(angleToItem - robotAngle); // calculate the relative angle
 		if (relativeAngle > 180) {
