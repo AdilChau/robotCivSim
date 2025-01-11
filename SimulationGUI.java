@@ -9,6 +9,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Slider;
 import javafx.scene.control.Button; // import button
 import javafx.scene.control.ToolBar; // import toolbar
 import javafx.scene.layout.BorderPane;
@@ -27,6 +28,7 @@ public class SimulationGUI extends Application {
 	private MyCanvas canvas; // custom canvas for drawing
 	private AnimationTimer timer; // animation timer for controlling simulation 
 	private boolean isPaused = false; // tracks if the animation is paused or running
+	private double speedMultiplier = 1.0; // multiplier for animation speed
 	
 	/** Method Start - sets up the JavaFX stage (window) and Scene (content)
 	 * 
@@ -67,14 +69,17 @@ public class SimulationGUI extends Application {
 		
 		// Animation Timer for movement
 		timer = new AnimationTimer() {
+			private long lastUpdate = 0; // to control speed
+			
 			@Override
 			public void handle(long now) {
-				for (ArenaItem item : arena.getItems()) {
-					item.update(); // Update the state of each item
+				if (lastUpdate == 0 || now - lastUpdate >= (long)(16_666_667 / speedMultiplier)) {
+					for (ArenaItem item : arena.getItems()) {
+						item.update(); // Update the state of each item
+					}
+					arena.drawArena(canvas); // draw the arena and items
+					lastUpdate = now; // reset the last update
 				}
-				
-				// Draw the arena and items
-				arena.drawArena(canvas);
 			}
 		};
 		timer.start();
@@ -132,8 +137,30 @@ public class SimulationGUI extends Application {
 		newCanvasButton.setOnAction(e -> resetCanvas()); // reset the canvas to a blank state
 		pausePlayButton.setOnAction(e -> togglePause(pausePlayButton)); // toggles pause/play
 		
+		// Label for the speed slider
+		javafx.scene.control.Label speedLabel = new javafx.scene.control.Label("Speed: 1.0x"); // default speed
+		
+		// Slider for speed control
+		Slider speedSlider = new Slider(0.5, 2.0, 1.0); // min=0.5x, max=2x, default=1x
+		speedSlider.setShowTickMarks(true); // show tick marks 
+		speedSlider.setShowTickLabels(true); // show tick labels
+		speedSlider.setMajorTickUnit(0.5);; // tick every 0.x
+		
+		// Update speed multiplier and label dynamically
+		speedSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+			speedMultiplier = newVal.doubleValue(); // update speed multiplier
+			speedLabel.setText(String.format("Speed: %.1fx", speedMultiplier));; // update the speed label
+		});
+		
 		// Add buttons to the toolbar
-		ToolBar toolBar = new ToolBar(addRobotButton, addObstacleButton, newCanvasButton, pausePlayButton);
+		ToolBar toolBar = new ToolBar(
+				addRobotButton, // add robot button
+				addObstacleButton, // add obstacle button
+				newCanvasButton, // new canvas button
+				pausePlayButton, // play/pause button
+				speedLabel, // speed label
+				speedSlider // speed slider
+		);
 		return toolBar;
 	}
 	
