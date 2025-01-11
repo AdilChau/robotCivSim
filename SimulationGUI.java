@@ -12,9 +12,11 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Button; // import button
 import javafx.scene.control.ToolBar; // import toolbar
 import javafx.scene.layout.BorderPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.layout.VBox; // for VBox layout
 import javafx.geometry.Pos; // for alignment options
+import java.io.*; // for saving and loading files
 
 /** SimulationGUI - Is the Main GUI class for the robot simulation.
  * It extends JavaFX Application to create and manage the GUI.
@@ -87,6 +89,11 @@ public class SimulationGUI extends Application {
 		Menu fileMenu = new Menu("File"); // initialises file option
 		MenuItem saveItem = new MenuItem("Save"); // initialises save option
 		MenuItem loadItem = new MenuItem("Load"); // initialises load option
+		
+		// Add actions to the Save and Load options
+		saveItem.setOnAction(e -> saveArenaToFile());
+		loadItem.setOnAction(e -> loadArenaFromFile());;
+		
 		fileMenu.getItems().addAll(saveItem, loadItem);
 		
 		// Configuration menu
@@ -244,6 +251,44 @@ public class SimulationGUI extends Application {
 	public void resetCanvas() {
 		arena.clearArena(); // clear all items in the arena
 		arena.drawArena(canvas); // redraw the empty arena (with borders only)
+	}
+	
+	
+	/** Method saveArenaToFile - Saves the current state of the arena to a file
+	 * Opens a file chooser dialog for the user to specify the save location
+	 */
+	private void saveArenaToFile() {
+		FileChooser fileChooser = new FileChooser();  // initialises new file chooser
+		fileChooser.setTitle("Save Arena"); // sets title
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Arena Files", "*.arena")); // restricts file types to only ones with extension ".arena"
+		File file = fileChooser.showSaveDialog(null); // show the save dialog and store the selected file 
+		
+		if (file != null) { // check if user selected a file
+			try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) { 
+				oos.writeObject(arena); // serialise the robot arena
+			} catch (IOException ex) {
+				ex.printStackTrace(); // print stack trace if an IOException
+			}
+		}
+	}
+	
+	/** Method loadArenaFromFile - Loads the state of the arena from a file selected by the user
+	 * Opens a file chooser dialog for the user to select a saved arena file
+	 */
+	private void loadArenaFromFile() {
+		FileChooser fileChooser = new FileChooser(); // initialises new file chooser
+		fileChooser.setTitle("Load Arena"); // sets title
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Arena File", "*.arena")); // restricts file types to only ones with extension ".arena"
+		File file = fileChooser.showOpenDialog(null); 
+		
+		if (file != null) { // check if user selected a file 
+			try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+				arena = (RobotArena) ois.readObject(); // deserialize the RobotArena
+				arena.drawArena(canvas); // redraw the loaded arena on the canvas
+			} catch (IOException | ClassNotFoundException ex) {
+				ex.printStackTrace(); // print stack trace if an IOException 
+			}
+		}
 	}
 	
 	/**

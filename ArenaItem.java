@@ -1,10 +1,13 @@
 package robotSimGUI;
 
+import java.io.Serializable; // for file save and load
 
 /** ArenaItem - Is an Abstract class which represents an item in the RobotArena.
  * Will define properties such as position and size, as well as, shared methods.
  */
-public abstract class ArenaItem { // use of "abstract" for draw method
+public abstract class ArenaItem implements Serializable { // use of "abstract" for draw method
+	@SuppressWarnings("unused") // static means it thinks its unused
+	private static final long serialVersionUID = 1L; // serialisation ID
 	// Private attributes for position and size
 	private double xPosition; // x-coordinate
 	private double yPosition; // y-coordinate

@@ -4,15 +4,22 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color; // For drawing the light beam
 import javafx.scene.shape.ArcType; // Import ArcType for drawing rounded arcs
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable; // for file save and load
+
 /** SmartRobot - This class represents a robot with a sensor to detect any nearby object.
  * This can include the boundary of the arena, obstacles, and other robots.
  * Extends the Robot class and includes some additional logic for the detection.
  */
 public class SmartRobot extends Robot {
+	@SuppressWarnings("unused") // static means it thinks its unused
+	private static final long serialVersionUID = 1L; // serialisation ID
 	private double sensorRange; // max distance the sensor can detect
 	private double sensorAngle; // angle of the light beam (e.g., 60 degrees)
-	private Color lightBeamColor;// current colour of the beam (will be yellow or red)
-	private Image[] frames; // array to store animation frames
+	private transient Color lightBeamColor;// current colour of the beam (will be yellow or red), (transient for serialisation)
+	private transient Image[] frames; // array to store animation frames (transient not serialisable)
 	private int currentFrameIndex; // index to track the current frame
 	private long lastFrameTime; // time when the last frame was updated
 	private static final long FRAME_DURATION = 200_000_000; // duration of each frame in nanoseconds
@@ -188,4 +195,50 @@ public class SmartRobot extends Robot {
 		
 		return relativeAngle <= sensorAngle / 2; // check if the relative angle is within the sensor's range
 	}
+	
+	/**
+	 * Method writeObject - This is custom serialisation logic for SmartRobot
+	 * It serialises non-transient fields and saves the transient lightBeamColor field as RGB components
+	 *
+	 * @param oos - The ObjectOutputStream to write the object's state
+	 * @throws IOException - If an I/O error occurs during writing
+	 */
+	private void writeObject(ObjectOutputStream oos) throws IOException {
+	    oos.defaultWriteObject(); // serialise all non-transient fields using default serialization
+
+	    // Save the lightBeamColor as its RGB components (Red, Green, Blue)
+	    oos.writeDouble(lightBeamColor.getRed());   // save the red component (0.0 to 1.0)
+	    oos.writeDouble(lightBeamColor.getGreen()); // save the green component (0.0 to 1.0)
+	    oos.writeDouble(lightBeamColor.getBlue());  // save the blue component (0.0 to 1.0)
+	}
+
+	/**
+	 * Method readObject - This is custom deserialisation logic for SmartRobot
+	 * It deserialises non-transient fields and restores the transient lightBeamColor field from RGB components
+	 * Restores the transient fields like the lightBeamColor and frames array
+	 *
+	 * @param ois - The ObjectInputStream to read the object's state
+	 * @throws IOException - If an I/O error occurs during reading
+	 * @throws ClassNotFoundException - If a class required for deserialisation cannot be found
+	 */
+	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+	    ois.defaultReadObject(); // deserialize all non-transient fields using default deserialization
+
+	    // Restore the lightBeamColor from its RGB components
+	    double red = ois.readDouble();   // read the red component (0.0 to 1.0)
+	    double green = ois.readDouble(); // read the green component (0.0 to 1.0)
+	    double blue = ois.readDouble();  // read the blue component (0.0 to 1.0)
+
+	    // Reconstruct the Colour object using the RGB values
+	    lightBeamColor = Color.color(red, green, blue);
+	    
+	    // Reinitialise the frames array
+	    frames = new Image[] {
+	        new Image("file:src/robotSimGUI/Assets/smartRobotFrame1.png"),
+	        new Image("file:src/robotSimGUI/Assets/smartRobotFrame2.png"),
+	        new Image("file:src/robotSimGUI/Assets/smartRobotFrame3.png"),
+	        new Image("file:src/robotSimGUI/Assets/smartRobotFrame4.png")
+	    };
+	}
+
 }

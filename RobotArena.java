@@ -1,15 +1,15 @@
 package robotSimGUI;
 
 import java.util.ArrayList; // import ArrayList
-
 import javafx.scene.paint.Color; // import Color for border
-
+import java.io.Serializable; // for file save and load
 
 /** RobotArena - Manages the arena, including size and the items within it.
  * Stores and interacts with robots and obstacles. 
  * 
  */
-public class RobotArena {
+public class RobotArena implements Serializable {
+	private static final long serialVersionUID = 1L; // serialisation ID
 	// Attributes for arena size and the ArrayList of items
 	private double width; // width of arena
 	private double height; // height of arena

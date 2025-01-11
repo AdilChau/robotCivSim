@@ -2,15 +2,22 @@ package robotSimGUI;
 
 import javafx.scene.image.Image; // to add assets
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable; // for file save and load
+
 /** Robot - Represents a moving Robot in the RobotArena
  * Inherits from ArenaItem and supports animated frames
  */
 public class Robot extends ArenaItem {
+	@SuppressWarnings("unused") // static means it thinks its unused
+	private static final long serialVersionUID = 1L; // serialisation ID
 	protected double dx; // x-direction of movement
 	protected double dy; // y-direction of movement
 	protected double speed; // speed multiplier
 	public RobotArena arena; // reference to the RobotArena instance
-	private Image[] frames; // array to store animation frames
+	private transient Image[] frames; // array to store animation frames (transient, not serialisable)
 	private int currentFrameIndex; // index to track the current frame
 	private long lastFrameTime; // time when the last frame was updated
 	private static final long FRAME_DURATION = 200_000_000; // duration of each frame in nanoseconds
@@ -168,6 +175,26 @@ public class Robot extends ArenaItem {
 		
 		// Check if the distance is less than the sum of the radii (including a collision)
 		return distance < (getRadius() + item.getRadius());
+	}
+	
+	/** Method writeObject - This serialises non-transient fields
+	 */
+	private void writeObject(ObjectOutputStream oos) throws IOException {
+	    oos.defaultWriteObject(); // serialise non-transient fields
+	}
+	/** Method readObject - This deserialises non-transient fields
+	 * It also restores the transient fields like the frames array
+	 */
+	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+	    ois.defaultReadObject(); // deserialize non-transient fields
+	    
+	    // Reinitialise the transient frames array
+	    frames = new Image[] {
+	        new Image("file:src/robotSimGUI/Assets/basicRobotFrame1.png"),
+	        new Image("file:src/robotSimGUI/Assets/basicRobotFrame2.png"),
+	        new Image("file:src/robotSimGUI/Assets/basicRobotFrame3.png"),
+	        new Image("file:src/robotSimGUI/Assets/basicRobotFrame4.png")
+	    };
 	}
 }
 

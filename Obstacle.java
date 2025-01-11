@@ -2,11 +2,13 @@ package robotSimGUI;
 
 import javafx.scene.image.Image; // for obstacle assets
 import javafx.scene.paint.Color; // for fallback
-
+import java.io.Serializable; // for file save and load
 /** Obstacle - Represents a static object in the RobotArena.
  * Inherits from ArenaItem.
  */
 public class Obstacle extends ArenaItem {
+	@SuppressWarnings("unused") // static means it thinks its unused
+	private static final long serialVersionUID = 1L; // serialisation ID
 	private String type; // type of obstacle (e.g., "tree", "rock")
 	
 	
