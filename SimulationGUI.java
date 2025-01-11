@@ -25,6 +25,8 @@ import java.io.*; // for saving and loading files
 public class SimulationGUI extends Application { 
 	private RobotArena arena; // RobotArena managing the simulation
 	private MyCanvas canvas; // custom canvas for drawing
+	private AnimationTimer timer; // animation timer for controlling simulation 
+	private boolean isPaused = false; // tracks if the animation is paused or running
 	
 	/** Method Start - sets up the JavaFX stage (window) and Scene (content)
 	 * 
@@ -64,7 +66,7 @@ public class SimulationGUI extends Application {
 		stage.show();
 		
 		// Animation Timer for movement
-		AnimationTimer timer = new AnimationTimer() {
+		timer = new AnimationTimer() {
 			@Override
 			public void handle(long now) {
 				for (ArenaItem item : arena.getItems()) {
@@ -120,16 +122,18 @@ public class SimulationGUI extends Application {
 	private ToolBar createToolBar() {
 		// Create buttons
 		Button addRobotButton = new Button("Add Robot"); // creates button to add robot
-		Button addObstacleButton = new Button("Add Obstacle"); // create button to add obstacle
-		Button newCanvasButton = new Button("New Canvas"); // create button to reset the canvas
+		Button addObstacleButton = new Button("Add Obstacle"); // creates button to add obstacle
+		Button newCanvasButton = new Button("New Canvas"); // creates button to reset the canvas
+		Button pausePlayButton = new Button("Pause"); // creates button to pause/play animation
 		
 		// Set up the button actions
 		addRobotButton.setOnAction(e -> showRobotMenu()); // allows addRobot button to have an action
 		addObstacleButton.setOnAction(e -> showObstacleMenu()); // opens obstacle selection menu
 		newCanvasButton.setOnAction(e -> resetCanvas()); // reset the canvas to a blank state
+		pausePlayButton.setOnAction(e -> togglePause(pausePlayButton)); // toggles pause/play
 		
 		// Add buttons to the toolbar
-		ToolBar toolBar = new ToolBar(addRobotButton, addObstacleButton, newCanvasButton);
+		ToolBar toolBar = new ToolBar(addRobotButton, addObstacleButton, newCanvasButton, pausePlayButton);
 		return toolBar;
 	}
 	
@@ -288,6 +292,23 @@ public class SimulationGUI extends Application {
 			} catch (IOException | ClassNotFoundException ex) {
 				ex.printStackTrace(); // print stack trace if an IOException 
 			}
+		}
+	}
+	
+	/** Method togglePause - Toggles the animation between pause and play states
+	 * Updates the button text and stops/starts the animation timer
+	 * 
+	 * @param button - The button to update its text based on the current state
+	 */
+	private void togglePause(Button button) {
+		isPaused = !isPaused; // toggle the pause state
+		
+		if (isPaused) {
+			timer.stop(); // toggle the pause state
+			button.setText("Play"); // update button text
+		} else {
+			timer.start(); // toggle the play state
+			button.setText("Pause"); // update button text
 		}
 	}
 	
