@@ -35,7 +35,7 @@ public class RobotArena implements Serializable {
 		this.itemsToRemove = new HashSet<>(); // initialise the removal set
 	}
 	
-	/** Method addItem - adds an item to the arena
+	/** Method addItem - This adds an item to the arena
 	 * 
 	 * @param item - the ArenaItem to be added
 	 */
@@ -61,7 +61,7 @@ public class RobotArena implements Serializable {
 	}
 	
 	
-	/** Method getItems - gets all items in the arena
+	/** Method getItems - This gets all items in the arena
 	 * 
 	 * @return list of all ArenaItems
 	 */
@@ -69,7 +69,7 @@ public class RobotArena implements Serializable {
 		return items; // get items
 	}
 	
-	/** Method getWidth - gets the arena width
+	/** Method getWidth - This gets the arena width
 	 * 
 	 * @return width
 	 */
@@ -77,7 +77,7 @@ public class RobotArena implements Serializable {
 		return width; // get width
 	}
 	
-	/** Method getHeight - gets the arena height
+	/** Method getHeight - This gets the arena height
 	 * 
 	 * @return height
 	 */
@@ -85,7 +85,7 @@ public class RobotArena implements Serializable {
 		return height; // get height
 	}
 	
-	/** Method checkOverlap - Checks if a given position overlaps with any existing item in the arena
+	/** Method checkOverlap - This checks if a given position overlaps with any existing item in the arena
 	 * Ensures that when adding new obstacles and robots they don't overlap with already existing ones
 	 * 
 	 * @param x - x-coordinate to check
@@ -130,7 +130,7 @@ public class RobotArena implements Serializable {
 		return basicRobots; // return list of basic robots
 	}
 	
-	/** Method scheduleRemoval - Schedules an item for removal after iteration
+	/** Method scheduleRemoval - This schedules an item for removal after iteration
 	 * 
 	 * @param item - The ArenaItem to remove
 	 */
@@ -141,7 +141,7 @@ public class RobotArena implements Serializable {
 		itemsToRemove.add(item); // add to removal set
 	}
 	
-	/** Method processRemovals - Removes all items that are marked for removal
+	/** Method processRemovals - This removes all items that are marked for removal
 	 * It ensures a safe removal of items after iteration (Helped fix ConcurrentModification error)
 	 */
 	public void processRemovals() {

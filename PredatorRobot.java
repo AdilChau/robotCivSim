@@ -1,6 +1,9 @@
 package robotSimGUI;
 
-import javafx.scene.image.Image; 
+import javafx.scene.image.Image;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable; // for file save and load
 
 /** PredatorRobot - Represents a robot that chases and eliminates basic robots.
@@ -126,5 +129,46 @@ public class PredatorRobot extends Robot implements Serializable {
 		
 		// Restore the GraphicsContext state
 		canvas.restore();
+	}
+	
+	/** Method getCurrentFrame - Retrieves the current animation frame
+	 * 
+	 * @return The current image object representing the animation frame
+	 */
+	public Image getCurrentFrame() {
+		return frames[currentFrameIndex]; // frames for predator robot
+	}
+	
+	/** Method getName - This retrieves the name of the item so it can be displayed when selected
+	 * 
+	 *  @return a string for the name of the robot
+	 */
+	@Override 
+	public String getName() {
+		return "Predator Robot";
+	}
+	
+	/** Method getDecsription - This retrieves the description of the item so it can be displayed when selected
+	 * 
+	 *  @return a string for the description of the robot
+	 */
+	@Override 
+	public String getDescription() {
+		return "A predator robot that hunts basic robots and eliminates them from the arena.";
+	}
+	
+	/** Method readObject - This deserialises non-transient fields
+	 * It also restores the transient fields like the frames array
+	 */
+	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+	    ois.defaultReadObject(); // deserialize non-transient fields
+	    
+	    // Reinitialise the transient frames array
+	    frames = new Image[] {
+	        new Image("file:src/robotSimGUI/Assets/predatorRobotFrame1.png"),
+	        new Image("file:src/robotSimGUI/Assets/predatorRobotFrame2.png"),
+	        new Image("file:src/robotSimGUI/Assets/predatorRobotFrame3.png"),
+	        new Image("file:src/robotSimGUI/Assets/predatorRobotFrame4.png")
+	    };
 	}
 }

@@ -237,5 +237,30 @@ public class SmartRobot extends Robot {
 	        new Image("file:src/robotSimGUI/Assets/smartRobotFrame4.png")
 	    };
 	}
-
+	
+	/** Method getCurrentFrame - Retrieves the current animation frame
+	 * 
+	 * @return The current image object representing the animation frame
+	 */
+	public Image getCurrentFrame() {
+		return frames[currentFrameIndex]; // frames for smart robot
+	}
+	
+	/** Method getName - This retrieves the name of the item so it can be displayed when selected
+	 * 
+	 *  @return a string for the name of the robot
+	 */
+	@Override 
+	public String getName() {
+		return "Smart Robot";
+	}
+	
+	/** Method getDecsription - This retrieves the description of the item so it can be displayed when selected
+	 * 
+	 *  @return a string for the description of the robot
+	 */
+	@Override 
+	public String getDescription() {
+		return "A smart robot with a unique sensor to help avoid collisions.";
+	}
 }

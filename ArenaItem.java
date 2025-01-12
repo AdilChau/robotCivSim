@@ -98,4 +98,20 @@ public abstract class ArenaItem implements Serializable { // use of "abstract" f
 			e.printStackTrace();
 		}
 	}
+	
+	/** Method getName - This retrieves the name of the item (this is overridden in subclasses)
+	 * 
+	 * @return a string which represents the name of the item
+	 */
+	public String getName() {
+		return "Normal Item";
+	}
+	
+	/** Method getDescription - This retrieves the description of the item (this is also overridden in subclasses)
+	 * 
+	 * @return a string which represents the description of the item
+	 */
+	public String getDescription() {
+		return "A normal item in the arena.";
+	}
 }

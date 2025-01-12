@@ -2,9 +2,9 @@ package robotSimGUI;
 
 import javafx.scene.image.Image; // to add assets
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.IOException; // for file save and load
+import java.io.ObjectInputStream; // for file save and load
+import java.io.ObjectOutputStream; // for file save and load
 import java.io.Serializable; // for file save and load
 
 /** Robot - Represents a moving Robot in the RobotArena
@@ -181,6 +181,32 @@ public class Robot extends ArenaItem {
 	        new Image("file:src/robotSimGUI/Assets/basicRobotFrame3.png"),
 	        new Image("file:src/robotSimGUI/Assets/basicRobotFrame4.png")
 	    };
+	}
+	
+	/** Method getCurrentFrame - Retrieves the current animation frame
+	 * 
+	 * @return The current image object representing the animation frame
+	 */
+	public Image getCurrentFrame() {
+		return frames[currentFrameIndex]; // frames for basic robot
+	}
+	
+	/** Method getName - This retrieves the name of the item so it can be displayed when selected
+	 * 
+	 *  @return a string for the name of the robot
+	 */
+	@Override 
+	public String getName() {
+		return "Basic Robot";
+	}
+	
+	/** Method getDecsription - This retrieves the description of the item so it can be displayed when selected
+	 * 
+	 *  @return a string for the description of the robot
+	 */
+	@Override 
+	public String getDescription() {
+		return "A basic robot with no unique functioanlity, bumps into other items around the arena.";
 	}
 }
 

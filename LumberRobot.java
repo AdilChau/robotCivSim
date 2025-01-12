@@ -1,6 +1,9 @@
 package robotSimGUI;
 
-import javafx.scene.image.Image; 
+import javafx.scene.image.Image;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable; // for file save and load
 
 
@@ -124,5 +127,46 @@ public class LumberRobot extends Robot implements Serializable {
         
         // Restore the GraphicsContext state
         canvas.restore();
+	}
+	
+	/** Method getCurrentFrame - Retrieves the current animation frame
+	 * 
+	 * @return The current image object representing the animation frame
+	 */
+	public Image getCurrentFrame() {
+		return frames[currentFrameIndex]; // frames for lumber robot
+	}
+	
+	/** Method getName - This retrieves the name of the item so it can be displayed when selected
+	 * 
+	 *  @return a string for the name of the robot
+	 */
+	@Override 
+	public String getName() {
+		return "Lumber Robot";
+	}
+	
+	/** Method getDecsription - This retrieves the description of the item so it can be displayed when selected
+	 * 
+	 *  @return a string for the description of the robot
+	 */
+	@Override 
+	public String getDescription() {
+		return "A lumber robot that moves around the arena chopping trees.";
+	}
+	
+	/** Method readObject - This deserialises non-transient fields
+	 * It also restores the transient fields like the frames array
+	 */
+	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+	    ois.defaultReadObject(); // deserialize non-transient fields
+	    
+	    // Reinitialise the transient frames array
+	    frames = new Image[] {
+	        new Image("file:src/robotSimGUI/Assets/lumberRobotFrame1.png"),
+	        new Image("file:src/robotSimGUI/Assets/lumberRobotFrame2.png"),
+	        new Image("file:src/robotSimGUI/Assets/lumberRobotFrame3.png"),
+	        new Image("file:src/robotSimGUI/Assets/lumberRobotFrame4.png")
+	    };
 	}
 }

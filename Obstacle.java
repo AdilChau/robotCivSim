@@ -66,4 +66,34 @@ public class Obstacle extends ArenaItem {
 	public String getType() {
 		return type; // return the obstacle type
 	}
+	
+	/** Method getImage - This retrieves the current image of the obstacle
+	 * 
+	 * @return The image object representing the obstacle
+	 */
+	public Image getImage() {
+		return switch (type.toLowerCase()) {
+        	case "tree" -> new Image(getClass().getResource("/robotSimGUI/Assets/treeObstacle.png").toExternalForm()); // retrieves tree image
+        	case "rock" -> new Image(getClass().getResource("/robotSimGUI/Assets/rockObstacle.png").toExternalForm()); // retrieves rock image
+        	default -> null; // default to null if the type selected is invalid
+		};
+	}
+	
+	/** Method getName - This retrieves the name of the item so it can be displayed when selected
+	 * 
+	 *  @return a string for the name of the robot
+	 */
+	@Override 
+	public String getName() {
+		return type.substring(0, 1).toUpperCase() + type.substring(1) + " Obstacle"; 
+	}
+	
+	/** Method getDecsription - This retrieves the description of the item so it can be displayed when selected
+	 * 
+	 *  @return a string for the description of the robot
+	 */
+	@Override 
+	public String getDescription() {
+		return "A stationary object that blocks robots or is farmed by specific robot type.";
+	}
 }

@@ -1,6 +1,5 @@
 package robotSimGUI;
 
-import javafx.animation.AnimationTimer;
 // Import necessary built-in classes for GUI
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -11,15 +10,23 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Button; // import button
+import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar; // import toolbar
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.scene.layout.VBox; // for VBox layout
+import javafx.geometry.Insets; // for VBox edges 
 import javafx.geometry.Pos; // for alignment options
 import java.io.*; // for saving and loading files
 import javafx.scene.input.MouseEvent; // for mouse drag option
 import javafx.scene.input.MouseButton; // for mouse click detection
+import javafx.animation.Animation; // for item popup
+import javafx.animation.AnimationTimer; // for item popup
+import javafx.animation.KeyFrame; // for item popup
+import javafx.animation.Timeline; // for item popup
 
 /** SimulationGUI - Is the Main GUI class for the robot simulation.
  * It extends JavaFX Application to create and manage the GUI.
@@ -95,6 +102,7 @@ public class SimulationGUI extends Application {
 		drawCanvas.setOnMouseReleased(this::handleMouseReleased); // handle release
 		
 		timer.start();
+		addCanvasClickHandler(drawCanvas); // allows for items to be selected
 	}
 	
 	/** CreateMenuBar method sets up the menu bar with some placeholder options
@@ -395,6 +403,80 @@ public class SimulationGUI extends Application {
 			draggedItem = null; // stop dragging the item
 		}
 	}
+	
+	/** Method handleCanvasClick - This handles mouse clicks on the canvas 
+	 * It will display information about the item that has been click in a popup dialog
+	 * 
+	 * @param x - The x-coordinate of the click
+	 * @param y - The y-coordinate of the click
+	 */
+	private void handleCanvasClick(double x, double y) {
+		ArenaItem clickedItem = arena.findItemAt(x,  y);
+		if (clickedItem != null) {
+			// Create and display the dialog
+			showItemDialog(clickedItem);
+		}
+	}
+	
+	/** Method showItemDialog - This displays a dialog with information about the clicked item
+	 * 
+	 * @param item - The ArenaItem to display information about
+	 */
+	public void showItemDialog(ArenaItem item) {
+		// Create a new stage for the dialog
+		Stage dialog = new Stage();
+		dialog.setTitle("Item Information"); // sets title
+		
+	    // Create labels for item information.
+	    Label nameLabel = new Label("Name: " + item.getName()); // displays item name
+	    Label descriptionLabel = new Label("Description: " + item.getDescription()); // displays item description
+	    Label positionLabel = new Label("Position: (" + String.format("%.2f", item.getXPosition()) + ", " + String.format("%.2f", item.getYPosition()) + ")"); // displays item coordinates to 2d.p
+	    
+	    // Create a button to remove the item from the arena
+	    Button removeButton = new Button("Remove");
+	    removeButton.setOnAction(e -> {
+	    	arena.scheduleRemoval(item); // place item in hashset for removal
+	    	dialog.close(); // close the dialog
+	    });
+	    
+	    // Create an image/animation viewer
+	    ImageView imageView = new ImageView(); // image for static items.
+	    if (item instanceof Robot) { // if the item is a type of robot
+	    	Robot robot = (Robot) item; // cast item to robot
+	    	Timeline animation = new Timeline( // create a new timeline
+	    		new KeyFrame(Duration.millis(200), e-> { // sets time for 200ms for each key frame
+	    			imageView.setImage(robot.getCurrentFrame()); // gets frame for robot
+	    		})
+	    	);
+	    	animation.setCycleCount(Animation.INDEFINITE); // animation will repeat itself until dialog box closed
+	    	animation.play(); // start the animation	    			
+	    } else if (item instanceof Obstacle) { // if the item is an obstacle
+	    	Obstacle obstacle = (Obstacle) item;
+	    	imageView.setImage(obstacle.getImage()); // gets image for obstacle 
+	    }
+	    imageView.setFitWidth(150); // set width
+	    imageView.setFitHeight(150); // set height
+	    
+	    // Layout for the dialog
+	    VBox layout = new VBox(10, imageView, nameLabel, descriptionLabel, positionLabel, removeButton);
+	    layout.setAlignment(Pos.CENTER); // center align
+	    layout.setPadding(new Insets(10)); // leave space at the edges
+	    
+	    // Set up scene and stage
+	    Scene scene = new Scene(layout, 300, 400); // set dimensions for dialog box
+	    dialog.setScene(scene); 
+	    dialog.showAndWait(); // display the dialog and wait for user interaction
+	}
+	
+	/** Method addCanvasClickHandler - This adds mouse click handling to the canvas
+	 * It allows items to be selected for further information/removal
+	 */
+	private void addCanvasClickHandler(Canvas canvas) {
+		canvas.setOnMouseClicked(e -> {
+			handleCanvasClick(e.getX(), e.getY()); // pass the clicked coordinates
+		});
+	}
+	
 	
 	/** Method saveArenaToFile - Saves the current state of the arena to a file
 	 * Opens a file chooser dialog for the user to specify the save location
