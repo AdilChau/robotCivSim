@@ -96,7 +96,7 @@ public class Robot extends ArenaItem {
 		}
 		
 		// Set the new position 
-		setPosition(newX, newY);
+		setPosition(newX, newY, arena.getWidth(), arena.getHeight());
 	}
 	
 	
@@ -140,25 +140,11 @@ public class Robot extends ArenaItem {
 	 * 
 	 * @param x = New x-coordinate
 	 * @param y = New y-coordinate
+	 * @param arenaWidth - Width of the arena
+	 * @param arenaHeight - height of the arena
 	 */
-	public void setPosition(double x, double y) {
-		try {
-			// Access the private xPosition fields from the ArenaItem class
-			java.lang.reflect.Field fieldX = ArenaItem.class.getDeclaredField("xPosition");
-			// Access the private yPosition fields from the ArenaItem class
-			java.lang.reflect.Field fieldY = ArenaItem.class.getDeclaredField("yPosition");
-			
-			// Set the fields to be accessible for modification
-			fieldX.setAccessible(true);
-			fieldY.setAccessible(true);
-			
-			// Update the xPosition and yPosition fields with the new values
-			fieldX.set(this, x);
-			fieldY.set(this, y);
-		} catch (Exception e) {
-			// Catch and print any exceptions that occur during the reflection process
-			e.printStackTrace();
-		}
+	public void setPosition(double x, double y, double arenaWidth, double arenaHeight) {
+			super.setPosition(x, y, arenaWidth, arenaHeight); // Delegate to base class (ArenaItem)
 	}
 	
 	/** Method checkCollision - Checks if this robot is colliding with another item

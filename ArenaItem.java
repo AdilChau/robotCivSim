@@ -66,9 +66,36 @@ public abstract class ArenaItem implements Serializable { // use of "abstract" f
 	 * 
 	 * @param x - The new x-coordinate
 	 * @param y - The new y-coordinate
+	 * @param arenaWidth - Width of the arena
+	 * @param arenaHeight - Height of the arena
 	 */
-	public void setPosition(double x, double y) {
-		this.xPosition = x;
-		this.yPosition = y;
+	public void setPosition(double x, double y, double arenaWidth, double arenaHeight) {
+		double newX = Math.max(getRadius(), Math.min(x, arenaWidth - getRadius())); // ensure within horizontal boundary
+		double newY = Math.max(getRadius(), Math.min(y, arenaHeight - getRadius())); // ensure within vertical boundary
+		
+		try {
+			java.lang.reflect.Field fieldX = ArenaItem.class.getDeclaredField("xPosition"); // access x position
+			java.lang.reflect.Field fieldY = ArenaItem.class.getDeclaredField("yPosition"); // access y position
+			
+			// Set both fields to be accessible 
+			fieldX.setAccessible(true);
+			fieldY.setAccessible(true);
+			
+			// Update x and y position with new ones
+			fieldX.set(this, newX);
+			fieldY.set(this, newY);
+		} catch (NoSuchFieldException e) {
+			// Handle case where the field name doesn't exist 
+			System.err.println("Field not found: " + e.getMessage());
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// Handle the case where access to the field is denied 
+			System.err.println("Illegal access to field" + e.getMessage()); 
+			e.printStackTrace();
+		} catch (Exception e) {
+			// Handle any other unexpected exceptions
+			System.err.println("Unexpected error when setting position: " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 }

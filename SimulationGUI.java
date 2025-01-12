@@ -379,7 +379,7 @@ public class SimulationGUI extends Application {
 			
 			// Update the item's position
 			if (!arena.checkOverlap(x, y, draggedItem.getRadius())) { // ensure no overlap
-				draggedItem.setPosition(x, y);
+				draggedItem.setPosition(x, y, arena.getWidth(), arena.getHeight());
 				arena.drawArena(canvas); // redraw arena to reflect changes
 			}
 		}
