@@ -141,7 +141,7 @@ public class Robot extends ArenaItem {
 	 * @param x = New x-coordinate
 	 * @param y = New y-coordinate
 	 */
-	private void setPosition(double x, double y) {
+	public void setPosition(double x, double y) {
 		try {
 			// Access the private xPosition fields from the ArenaItem class
 			java.lang.reflect.Field fieldX = ArenaItem.class.getDeclaredField("xPosition");

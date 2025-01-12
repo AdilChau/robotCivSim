@@ -18,9 +18,12 @@ import javafx.stage.Stage;
 import javafx.scene.layout.VBox; // for VBox layout
 import javafx.geometry.Pos; // for alignment options
 import java.io.*; // for saving and loading files
+import javafx.scene.input.MouseEvent; // for mouse drag option
+import javafx.scene.input.MouseButton; // for mouse click detection
 
 /** SimulationGUI - Is the Main GUI class for the robot simulation.
  * It extends JavaFX Application to create and manage the GUI.
+ * Also implements functioanlity to click and ddrag items in the arena.
  * 
  */
 public class SimulationGUI extends Application { 
@@ -29,6 +32,7 @@ public class SimulationGUI extends Application {
 	private AnimationTimer timer; // animation timer for controlling simulation 
 	private boolean isPaused = false; // tracks if the animation is paused or running
 	private double speedMultiplier = 1.0; // multiplier for animation speed
+	private ArenaItem draggedItem = null; // currently dragged item
 	
 	/** Method Start - sets up the JavaFX stage (window) and Scene (content)
 	 * 
@@ -84,6 +88,12 @@ public class SimulationGUI extends Application {
 				}
 			}
 		};
+		
+		// Add mouse event listeners to the canvas
+		drawCanvas.setOnMousePressed(this::handleMousePressed); // handle clicks
+		drawCanvas.setOnMouseDragged(this::handleMouseDragged); // handle dragging
+		drawCanvas.setOnMouseReleased(this::handleMouseReleased); // handle release
+		
 		timer.start();
 	}
 	
@@ -341,6 +351,50 @@ public class SimulationGUI extends Application {
 		arena.drawArena(canvas); // redraw the empty arena (with borders only)
 	}
 	
+	
+	/** Method handleMousePressed - This detects when the mouse is pressed
+	 * It identifies the item under the mouse and marks it for dragging
+	 * 
+	 * @param event - MouseEvent containing details of the click
+	 */
+	private void handleMousePressed(MouseEvent event) {
+		if (event.getButton() == MouseButton.PRIMARY) { // only handle left-clicks
+			double x = event.getX();
+			double y = event.getY();
+			
+			// Find the item at the clicked position
+			draggedItem = arena.findItemAt(x, y);
+		}
+	}
+	
+	/** Method handleMouseDragged - This tracks mouse movement while dragging an item
+	 * It updates the item's position to follow the mouse
+	 * 
+	 * @param event - MouseEvent containing details of the drag
+	 */
+	private void handleMouseDragged(MouseEvent event) {
+		if (draggedItem != null) {
+			double x = event.getX();
+			double y = event.getY();
+			
+			// Update the item's position
+			if (!arena.checkOverlap(x, y, draggedItem.getRadius())) { // ensure no overlap
+				draggedItem.setPosition(x, y);
+				arena.drawArena(canvas); // redraw arena to reflect changes
+			}
+		}
+	}
+	
+	/** Method handleMouseReleased - This handles when the mouse is released
+	 * It stops the item being dragged further
+	 * 
+	 * @param event - MouseEvent containing details of the release
+	 */
+	private void handleMouseReleased(MouseEvent event) {
+		if (event.getButton() == MouseButton.PRIMARY) { // only handle left-clicks
+			draggedItem = null; // stop dragging the item
+		}
+	}
 	
 	/** Method saveArenaToFile - Saves the current state of the arena to a file
 	 * Opens a file chooser dialog for the user to specify the save location

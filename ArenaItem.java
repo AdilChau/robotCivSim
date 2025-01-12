@@ -61,4 +61,14 @@ public abstract class ArenaItem implements Serializable { // use of "abstract" f
 	 * 
 	 */
 	public abstract void update();
+
+	/** Method setPosition - This updates the position of the item
+	 * 
+	 * @param x - The new x-coordinate
+	 * @param y - The new y-coordinate
+	 */
+	public void setPosition(double x, double y) {
+		this.xPosition = x;
+		this.yPosition = y;
+	}
 }

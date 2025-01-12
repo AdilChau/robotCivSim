@@ -161,6 +161,26 @@ public class RobotArena implements Serializable {
 	    ois.defaultReadObject();
 	    itemsToRemove = new HashSet<>(); // reinitialize transient field
 	}
+	
+	/** Method findItemAt - This finds the item at the given coordinates
+	 * 
+	 * @param x - The x-coordinate of the click
+	 * @param y - The y-coordinate of the click
+	 * @return The ArenaItem at the given position, or null if none found
+	 */
+	public ArenaItem findItemAt(double x, double y ) {
+		for (ArenaItem item : items) {
+			double dx = x - item.getXPosition(); // find x
+			double dy = y - item.getYPosition(); // find y
+			double distance = Math.sqrt(dx * dx + dy * dy); // calculate distance 
+			
+			// Check if the click is within the item's radius
+			if (distance <= item.getRadius()) {
+				return item;
+			}
+		}
+		return null; // no item found
+	}
 
 }
 
