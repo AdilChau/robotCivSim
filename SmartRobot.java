@@ -20,9 +20,6 @@ public class SmartRobot extends Robot {
 	private double sensorAngle; // angle of the light beam (e.g., 60 degrees)
 	private transient Color lightBeamColor;// current colour of the beam (will be yellow or red), (transient for serialisation)
 	private transient Image[] frames; // array to store animation frames (transient not serialisable)
-	private int currentFrameIndex; // index to track the current frame
-	private long lastFrameTime; // time when the last frame was updated
-	private static final long FRAME_DURATION = 200_000_000; // duration of each frame in nanoseconds
 	
 	/** Constructor for SmartRobot
 	 * This initialises the robot with position, size, movement speed, and detection capabilities

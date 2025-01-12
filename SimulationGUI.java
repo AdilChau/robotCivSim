@@ -182,6 +182,8 @@ public class SimulationGUI extends Application {
 			arena.addItem(new Robot(x, y, 20, arena)); // add basic robot using validated coordinates
 		} else if (type == RobotType.SMART) {
 			arena.addItem(new SmartRobot(x, y, 20, arena)); // add smart robot using validated coordinates
+		} else if (type == RobotType.PREDATOR) {
+			arena.addItem(new PredatorRobot(x, y, 20, arena)); // add predator robot using validated coordinates
 		}
 		
 		// Redraw the arena
@@ -201,6 +203,7 @@ public class SimulationGUI extends Application {
 		// Create buttons for each of the robot types
 		Button basicRobotButton = new Button("Basic Robot");
 		Button smartRobotButton = new Button("Smart Robot");
+		Button predatorRobotButton = new Button("Predator Robot");
 		
 		// Set up the actions of each button
 		basicRobotButton.setOnAction(e -> {
@@ -213,8 +216,13 @@ public class SimulationGUI extends Application {
 			dialog.close();
 		});
 		
+		predatorRobotButton.setOnAction(e -> {
+			addRobot(RobotType.PREDATOR); // adds a predator robot 
+			dialog.close();
+		});
+		
 		// Layout for the buttons
-		VBox layout = new VBox(10, basicRobotButton, smartRobotButton); // vertical box layout with spacing
+		VBox layout = new VBox(10, basicRobotButton, smartRobotButton, predatorRobotButton); // vertical box layout with spacing
 		layout.setAlignment(Pos.CENTER); // center-align the buttons 
 		Scene scene = new Scene(layout, 200, 150); // create the scene with specified size
 		dialog.setScene(scene);

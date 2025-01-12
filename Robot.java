@@ -18,9 +18,9 @@ public class Robot extends ArenaItem {
 	protected double speed; // speed multiplier
 	public RobotArena arena; // reference to the RobotArena instance
 	private transient Image[] frames; // array to store animation frames (transient, not serialisable)
-	private int currentFrameIndex; // index to track the current frame
-	private long lastFrameTime; // time when the last frame was updated
-	private static final long FRAME_DURATION = 200_000_000; // duration of each frame in nanoseconds
+	public int currentFrameIndex; // index to track the current frame
+	public long lastFrameTime; // time when the last frame was updated
+	public static final long FRAME_DURATION = 200_000_000; // duration of each frame in nanoseconds
 	
 	
 	

@@ -1,6 +1,8 @@
 package robotSimGUI;
 
 import java.util.ArrayList; // import ArrayList
+import java.util.List; // to retrieve a list of basic robots
+
 import javafx.scene.paint.Color; // import Color for border
 import java.io.Serializable; // for file save and load
 
@@ -108,6 +110,19 @@ public class RobotArena implements Serializable {
 		items.clear(); // clear all items from the list
 	}
 	
+	/** Method getBasicRobots - This retrieves all basic robots in the arena
+	*
+	*@return A list of basic robots
+	*/
+	public List<Robot> getBasicRobots() {
+		List<Robot> basicRobots = new ArrayList<>(); // initialise list
+		for (ArenaItem item : items) {
+			if (item instanceof Robot && !(item instanceof PredatorRobot)) { // only include basic robots
+				basicRobots.add((Robot) item);
+			}
+		}
+		return basicRobots; // return list of basic robots
+	}
 }
 
  
