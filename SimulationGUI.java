@@ -186,6 +186,8 @@ public class SimulationGUI extends Application {
 			arena.addItem(new SmartRobot(x, y, 20, arena)); // add smart robot using validated coordinates
 		} else if (type == RobotType.PREDATOR) {
 			arena.addItem(new PredatorRobot(x, y, 20, arena)); // add predator robot using validated coordinates
+		} else if (type == RobotType.LUMBER) {
+			arena.addItem(new LumberRobot(x, y, 20, arena)); // add lumebr robot using validated coordinates
 		}
 		
 		// Redraw the arena
@@ -194,7 +196,7 @@ public class SimulationGUI extends Application {
 
 	}
 	
-	/** Method showRobotMeny - Displays a popup menu to choose robot type 
+	/** Method showRobotMenu - Displays a popup menu to choose robot type 
 	 * It allows for the user to select a specific robot to add out of available options(e.g., Basic, Smart)
 	 */
 	public void showRobotMenu() {
@@ -206,6 +208,7 @@ public class SimulationGUI extends Application {
 		Button basicRobotButton = new Button("Basic Robot");
 		Button smartRobotButton = new Button("Smart Robot");
 		Button predatorRobotButton = new Button("Predator Robot");
+		Button lumberRobotButton = new Button("Lumber Robot");
 		
 		// Set up the actions of each button
 		basicRobotButton.setOnAction(e -> {
@@ -223,8 +226,13 @@ public class SimulationGUI extends Application {
 			dialog.close();
 		});
 		
+		lumberRobotButton.setOnAction(e -> {
+			addRobot(RobotType.LUMBER); // adds a lumber robot
+			dialog.close();
+		});
+		
 		// Layout for the buttons
-		VBox layout = new VBox(10, basicRobotButton, smartRobotButton, predatorRobotButton); // vertical box layout with spacing
+		VBox layout = new VBox(10, basicRobotButton, smartRobotButton, predatorRobotButton, lumberRobotButton); // vertical box layout with spacing
 		layout.setAlignment(Pos.CENTER); // center-align the buttons 
 		Scene scene = new Scene(layout, 200, 150); // create the scene with specified size
 		dialog.setScene(scene);

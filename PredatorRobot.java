@@ -78,7 +78,7 @@ public class PredatorRobot extends Robot implements Serializable {
 		
 		// Iterate over all items in the arena 
 		for (ArenaItem item : arena.getItems()) {
-			if (item instanceof Robot && !(item instanceof PredatorRobot) && !(item instanceof SmartRobot)) { // only consider basic robots
+			if (item instanceof Robot && !(item instanceof PredatorRobot) && !(item instanceof SmartRobot) && !(item instanceof LumberRobot)) { // only consider basic robots
 				Robot robot = (Robot) item;
 				double dx = robot.getXPosition() - getXPosition(); // horizontal distance 
 				double dy = robot.getYPosition() - getYPosition(); // vertical distance

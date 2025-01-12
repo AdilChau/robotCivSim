@@ -5,5 +5,6 @@ package robotSimGUI;
 public enum RobotType {
 	BASIC, // basic robot type
 	SMART,  // smart robot type
-	PREDATOR; // predator robot type
+	PREDATOR, // predator robot type
+	LUMBER; // lumber robot type
 }

@@ -58,4 +58,12 @@ public class Obstacle extends ArenaItem {
 	public void update() {
 		// Static object - So no updates required
 	}
+	
+	/** Method getType - This gets the type of the obstacle
+	 * 
+	 * @return the type of the obstacle (e.g., "tree", "rock")
+	 */
+	public String getType() {
+		return type; // return the obstacle type
+	}
 }
