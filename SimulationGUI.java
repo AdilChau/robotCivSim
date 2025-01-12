@@ -113,6 +113,9 @@ public class SimulationGUI extends Application {
 		// Help menu
 		Menu helpMenu = new Menu ("Help"); // initialises help menu option
 		MenuItem aboutItem = new MenuItem("About"); // initialises about menu option
+		
+		// Add action for the About menu item
+		aboutItem.setOnAction(e -> showAboutDialog());
 		helpMenu.getItems().add(aboutItem);
 		
 		// Add menus to the menu bar
@@ -242,7 +245,7 @@ public class SimulationGUI extends Application {
 		// Layout for the buttons
 		VBox layout = new VBox(10, basicRobotButton, smartRobotButton, predatorRobotButton, lumberRobotButton, minerRobotButton); // vertical box layout with spacing
 		layout.setAlignment(Pos.CENTER); // center-align the buttons 
-		Scene scene = new Scene(layout, 200, 150); // create the scene with specified size
+		Scene scene = new Scene(layout, 300, 300); // create the scene with specified size
 		dialog.setScene(scene);
 		dialog.showAndWait(); // show the dialog box and wait for user interaction
 	}
@@ -301,6 +304,34 @@ public class SimulationGUI extends Application {
 		arena.drawArena(canvas); // redraw the arena
 	}
 	
+	/** Method showAboutDialog - This displays an "About" dialog with information on the project and myself
+	 * 
+	 */
+	private void showAboutDialog() {
+		// Create a new stage for the dialog
+		Stage aboutStage = new Stage();
+		aboutStage.setTitle("About"); // sets title of the dialog
+		
+		// Content for the about dialog
+		javafx.scene.control.Label aboutLabel = new javafx.scene.control.Label(
+				"CS2OP Robot Simulation Coursework\n\n" +
+				"Developed by: Adil Chaudhry\n" +
+				"Student Number: 32023993\n\n" +
+				"This project simulates an arena where many differnt robots can interact with each other and various obstacles.\n" +
+				"They will perform tasks such as chasing, cutting wood, or mining."	
+		);
+		aboutLabel.setWrapText(true); // allow text wrapping for better readability
+		
+		// Layout for the dialog 
+		VBox layout = new VBox(10, aboutLabel); // add spacing between elements
+		layout.setAlignment(Pos.CENTER); // center-align the content
+		layout.setPadding(new javafx.geometry.Insets(10)); // add padding around the content
+		
+		// Set up the scene and stage
+		Scene scene = new Scene(layout, 400, 200); // set dimensions for dialog box
+		aboutStage.setScene(scene);
+		aboutStage.showAndWait(); // show the dialog and wait for user interaction 
+	}
 	
 	/** Method resetCanvas - This resets the canvas and arena to a blank state
 	 * Removes all entities from the arena and clears the canvas
