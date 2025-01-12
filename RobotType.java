@@ -6,5 +6,6 @@ public enum RobotType {
 	BASIC, // basic robot type
 	SMART,  // smart robot type
 	PREDATOR, // predator robot type
-	LUMBER; // lumber robot type
+	LUMBER, // lumber robot type
+	MINER; // miner robot type
 }

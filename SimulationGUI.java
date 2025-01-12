@@ -187,7 +187,9 @@ public class SimulationGUI extends Application {
 		} else if (type == RobotType.PREDATOR) {
 			arena.addItem(new PredatorRobot(x, y, 20, arena)); // add predator robot using validated coordinates
 		} else if (type == RobotType.LUMBER) {
-			arena.addItem(new LumberRobot(x, y, 20, arena)); // add lumebr robot using validated coordinates
+			arena.addItem(new LumberRobot(x, y, 20, arena)); // add lumber robot using validated coordinates
+		} else if (type == RobotType.MINER) {
+			arena.addItem(new MinerRobot(x, y, 20, arena)); // add miner robot using valdiated coordinates
 		}
 		
 		// Redraw the arena
@@ -209,6 +211,7 @@ public class SimulationGUI extends Application {
 		Button smartRobotButton = new Button("Smart Robot");
 		Button predatorRobotButton = new Button("Predator Robot");
 		Button lumberRobotButton = new Button("Lumber Robot");
+		Button minerRobotButton = new Button("Miner Robot");
 		
 		// Set up the actions of each button
 		basicRobotButton.setOnAction(e -> {
@@ -231,8 +234,13 @@ public class SimulationGUI extends Application {
 			dialog.close();
 		});
 		
+		minerRobotButton.setOnAction(e -> {
+			addRobot(RobotType.MINER); // adds a miner robot
+			dialog.close();
+		});
+		
 		// Layout for the buttons
-		VBox layout = new VBox(10, basicRobotButton, smartRobotButton, predatorRobotButton, lumberRobotButton); // vertical box layout with spacing
+		VBox layout = new VBox(10, basicRobotButton, smartRobotButton, predatorRobotButton, lumberRobotButton, minerRobotButton); // vertical box layout with spacing
 		layout.setAlignment(Pos.CENTER); // center-align the buttons 
 		Scene scene = new Scene(layout, 200, 150); // create the scene with specified size
 		dialog.setScene(scene);

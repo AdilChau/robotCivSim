@@ -93,7 +93,7 @@ public class LumberRobot extends Robot implements Serializable {
 		return closestTree; // return the closest tree, or null if none found
 	}
 	
-	/** Method draw - This draws theLumberRobot on the canvas
+	/** Method draw - This draws the LumberRobot on the canvas
 	 * It displays its unique animation frames.
 	 * 
 	 * @param canvas - MyCanvas instance for rendering
