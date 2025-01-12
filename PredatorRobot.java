@@ -2,8 +2,8 @@ package robotSimGUI;
 
 import javafx.scene.image.Image;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.IOException; // for file save and load
+import java.io.ObjectInputStream; // for file save and load
 import java.io.Serializable; // for file save and load
 
 /** PredatorRobot - Represents a robot that chases and eliminates basic robots.

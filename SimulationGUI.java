@@ -40,6 +40,7 @@ public class SimulationGUI extends Application {
 	private boolean isPaused = false; // tracks if the animation is paused or running
 	private double speedMultiplier = 1.0; // multiplier for animation speed
 	private ArenaItem draggedItem = null; // currently dragged item
+	private boolean isDragging = false; // flag to track if an item is being dragged
 	
 	/** Method Start - sets up the JavaFX stage (window) and Scene (content)
 	 * 
@@ -372,6 +373,7 @@ public class SimulationGUI extends Application {
 			
 			// Find the item at the clicked position
 			draggedItem = arena.findItemAt(x, y);
+			isDragging = false; // reset dragging flag
 		}
 	}
 	
@@ -389,6 +391,7 @@ public class SimulationGUI extends Application {
 			if (!arena.checkOverlap(x, y, draggedItem.getRadius())) { // ensure no overlap
 				draggedItem.setPosition(x, y, arena.getWidth(), arena.getHeight());
 				arena.drawArena(canvas); // redraw arena to reflect changes
+				isDragging = true; // set flag as dragging
 			}
 		}
 	}
@@ -400,6 +403,10 @@ public class SimulationGUI extends Application {
 	 */
 	private void handleMouseReleased(MouseEvent event) {
 		if (event.getButton() == MouseButton.PRIMARY) { // only handle left-clicks
+			if(!isDragging && draggedItem != null) {
+				// If not dragging, handle it as a click for popup
+				handleCanvasClick(event.getX(), event.getY());
+			}
 			draggedItem = null; // stop dragging the item
 		}
 	}
@@ -473,7 +480,9 @@ public class SimulationGUI extends Application {
 	 */
 	private void addCanvasClickHandler(Canvas canvas) {
 		canvas.setOnMouseClicked(e -> {
-			handleCanvasClick(e.getX(), e.getY()); // pass the clicked coordinates
+			if (!isDragging) { // only handle clicks if dragging is false
+				handleCanvasClick(e.getX(), e.getY()); // pass the clicked coordinates
+			}
 		});
 	}
 	
