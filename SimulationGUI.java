@@ -73,10 +73,12 @@ public class SimulationGUI extends Application {
 			
 			@Override
 			public void handle(long now) {
-				if (lastUpdate == 0 || now - lastUpdate >= (long)(16_666_667 / speedMultiplier)) {
+				long adjustedInterval = (long)(16_666_667 / Math.max(speedMultiplier, 0.1)); // avoid division by zero
+				if (lastUpdate == 0 || now - lastUpdate >= adjustedInterval) {
 					for (ArenaItem item : arena.getItems()) {
 						item.update(); // Update the state of each item
 					}
+					arena.processRemovals(); // process any scheduled removals
 					arena.drawArena(canvas); // draw the arena and items
 					lastUpdate = now; // reset the last update
 				}

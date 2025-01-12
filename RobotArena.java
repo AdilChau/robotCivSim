@@ -1,9 +1,13 @@
 package robotSimGUI;
 
 import java.util.ArrayList; // import ArrayList
+import java.util.HashSet; // for unique removal tracking
 import java.util.List; // to retrieve a list of basic robots
 
 import javafx.scene.paint.Color; // import Color for border
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable; // for file save and load
 
 /** RobotArena - Manages the arena, including size and the items within it.
@@ -16,6 +20,7 @@ public class RobotArena implements Serializable {
 	private double width; // width of arena
 	private double height; // height of arena
 	private ArrayList<ArenaItem> items; // make an ArrayList of ArenaItems
+	private transient HashSet<ArenaItem> itemsToRemove; // transient to avoid serialisation
 	
 	/** Constructor for RobotArena 
 	 * Initialises the arena with specified dimensions and an empty list of items
@@ -27,6 +32,7 @@ public class RobotArena implements Serializable {
 		this.width = width; // initialise width
 		this.height = height; // initialise height
 		this.items = new ArrayList<>(); // create an empty list of items
+		this.itemsToRemove = new HashSet<>(); // initialise the removal set
 	}
 	
 	/** Method addItem - adds an item to the arena
@@ -123,6 +129,39 @@ public class RobotArena implements Serializable {
 		}
 		return basicRobots; // return list of basic robots
 	}
+	
+	/** Method scheduleRemoval - Schedules an item for removal after iteration
+	 * 
+	 * @param item - The ArenaItem to remove
+	 */
+	public void scheduleRemoval(ArenaItem item) {
+		if (itemsToRemove == null) {
+			itemsToRemove = new HashSet<>();
+		}
+		itemsToRemove.add(item); // add to removal set
+	}
+	
+	/** Method processRemovals - Removes all items that are marked for removal
+	 * It ensures a safe removal of items after iteration (Helped fix ConcurrentModification error)
+	 */
+	public void processRemovals() {
+		items.removeAll(itemsToRemove); // remove all scheduled items
+		itemsToRemove.clear(); // clear the removal sets
+	}
+	
+	/** Method to deserialise the logic for RobotArena
+	 * This method ensures that transient fields, such as itemsToRemove are properly reinitialised after deserialisation
+	 *  
+	 * 
+	 * @param ois - The ObjectInputStream used for reading the serialised object
+	 * @throws IOException - If an I/O error occurs during deserialisation
+	 * @throws ClassNotFoundException - If the class of a serialised object cannot be found 
+	 */
+	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+	    ois.defaultReadObject();
+	    itemsToRemove = new HashSet<>(); // reinitialize transient field
+	}
+
 }
 
  

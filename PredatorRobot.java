@@ -34,7 +34,7 @@ public class PredatorRobot extends Robot implements Serializable {
 		};
 	}
 
-	/** Methpd update - Updates the predator robot's behaviour 
+	/** Method update - Updates the predator robot's behaviour 
 	 * The predator chases the closest basic robot 
 	 * If there isn't a basic robot on canvas, the PredatorRobot acts like a normal robot
 	 */
@@ -52,8 +52,9 @@ public class PredatorRobot extends Robot implements Serializable {
 			double distance = Math.sqrt(dxToTarget * dxToTarget + dyToTarget * dyToTarget); // calculate distance
 			
 			// If close enough to the target, "eliminate" it 
-			if (distance <getRadius() + targetRobot.getRadius()) {
-				arena.getItems().remove(targetRobot); //remove the basic robot from the arena 
+			if (distance < getRadius() + targetRobot.getRadius()) {
+				// Schedule for removal (don't directly remove)
+				arena.scheduleRemoval(targetRobot);
 				targetRobot = null; // reset the target
 			} else {
 				// Move toward the target
@@ -77,7 +78,7 @@ public class PredatorRobot extends Robot implements Serializable {
 		
 		// Iterate over all items in the arena 
 		for (ArenaItem item : arena.getItems()) {
-			if (item instanceof Robot && !(item instanceof PredatorRobot)) { // only consider basic robots
+			if (item instanceof Robot && !(item instanceof PredatorRobot) && !(item instanceof SmartRobot)) { // only consider basic robots
 				Robot robot = (Robot) item;
 				double dx = robot.getXPosition() - getXPosition(); // horizontal distance 
 				double dy = robot.getYPosition() - getYPosition(); // vertical distance
