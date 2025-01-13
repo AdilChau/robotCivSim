@@ -30,7 +30,7 @@ import javafx.animation.Timeline; // for item popup
 
 /** SimulationGUI - Is the Main GUI class for the robot simulation.
  * It extends JavaFX Application to create and manage the GUI.
- * Also implements functioanlity to click and ddrag items in the arena.
+ * Also implements functionality to click and drag items in the arena.
  * 
  */
 public class SimulationGUI extends Application { 
@@ -42,7 +42,7 @@ public class SimulationGUI extends Application {
 	private ArenaItem draggedItem = null; // currently dragged item
 	private boolean isDragging = false; // flag to track if an item is being dragged
 	
-	/** Method Start - sets up the JavaFX stage (window) and Scene (content)
+	/** Method Start - sets up the JavaFX stage (the window) and Scene (the content)
 	 * 
 	 * @param stage - Primary stage for the application
 	 */
@@ -106,9 +106,9 @@ public class SimulationGUI extends Application {
 		addCanvasClickHandler(drawCanvas); // allows for items to be selected
 	}
 	
-	/** CreateMenuBar method sets up the menu bar with some placeholder options
+	/** Method CreateMenuBar - This sets up the menu bar with some placeholder options
 	 * 
-	 * @return MenuBar - The create menu bar.
+	 * @return MenuBar - The create menu bar
 	 */
 	private MenuBar createMenuBar() {
 		MenuBar menuBar = new MenuBar(); // initialises menu bar object
@@ -124,11 +124,6 @@ public class SimulationGUI extends Application {
 		
 		fileMenu.getItems().addAll(saveItem, loadItem);
 		
-		// Configuration menu
-		Menu configMenu = new Menu("Configuration"); // initialises configuration menu option
-		MenuItem configureArena = new MenuItem("Configure Arena"); // initialises configure arena option
-		configMenu.getItems().add(configureArena);
-		
 		// Help menu
 		Menu helpMenu = new Menu ("Help"); // initialises help menu option
 		MenuItem aboutItem = new MenuItem("About"); // initialises about menu option
@@ -138,7 +133,7 @@ public class SimulationGUI extends Application {
 		helpMenu.getItems().add(aboutItem);
 		
 		// Add menus to the menu bar
-		menuBar.getMenus().addAll(fileMenu, configMenu, helpMenu);
+		menuBar.getMenus().addAll(fileMenu, helpMenu);
 		
 		return menuBar;
 	}
@@ -336,8 +331,11 @@ public class SimulationGUI extends Application {
 				"CS2OP Robot Simulation Coursework\n\n" +
 				"Developed by: Adil Chaudhry\n" +
 				"Student Number: 32023993\n\n" +
-				"This project simulates an arena where many differnt robots can interact with each other and various obstacles.\n" +
-				"They will perform tasks such as chasing, cutting wood, or mining."	
+				"This project simulates an arena where many different robots can interact with each other and various obstacles.\n" +
+				"They will perform tasks such as chasing, cutting wood, or mining.\n\n" +
+				"Use the menu to add robots/obstacles and control the animation.\n\n" +
+				"You can click on any item for more information.\n" +
+				"If any robot gets stuck you can drag them to a new position."
 		);
 		aboutLabel.setWrapText(true); // allow text wrapping for better readability
 		
@@ -347,7 +345,7 @@ public class SimulationGUI extends Application {
 		layout.setPadding(new javafx.geometry.Insets(10)); // add padding around the content
 		
 		// Set up the scene and stage
-		Scene scene = new Scene(layout, 400, 200); // set dimensions for dialog box
+		Scene scene = new Scene(layout, 650, 300); // set dimensions for dialog box
 		aboutStage.setScene(scene);
 		aboutStage.showAndWait(); // show the dialog and wait for user interaction 
 	}
@@ -470,7 +468,7 @@ public class SimulationGUI extends Application {
 	    layout.setPadding(new Insets(10)); // leave space at the edges
 	    
 	    // Set up scene and stage
-	    Scene scene = new Scene(layout, 300, 400); // set dimensions for dialog box
+	    Scene scene = new Scene(layout, 600, 400); // set dimensions for dialog box
 	    dialog.setScene(scene); 
 	    dialog.showAndWait(); // display the dialog and wait for user interaction
 	}
