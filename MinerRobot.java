@@ -96,7 +96,7 @@ public class MinerRobot extends Robot implements Serializable {
 		return closestRock; // return the closest rock, or null if none found
 	}
 	
-	/** Method draw - This draws the MinerRo on the canvas
+	/** Method draw - This draws the MinerRobot on the canvas
 	 * It displays its unique animation frames.
 	 * 
 	 * @param canvas - MyCanvas instance for rendering
@@ -129,7 +129,7 @@ public class MinerRobot extends Robot implements Serializable {
         canvas.restore();
 	}
 	
-	/** Method getCurrentFrame - Retrieves the current animation frame
+	/** Method getCurrentFrame - This retrieves the current animation frame
 	 * 
 	 * @return The current image object representing the animation frame
 	 */

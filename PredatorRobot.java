@@ -37,7 +37,7 @@ public class PredatorRobot extends Robot implements Serializable {
 		};
 	}
 
-	/** Method update - Updates the predator robot's behaviour 
+	/** Method update - This updates the predator robot's behaviour 
 	 * The predator chases the closest basic robot 
 	 * If there isn't a basic robot on canvas, the PredatorRobot acts like a normal robot
 	 */
@@ -71,7 +71,7 @@ public class PredatorRobot extends Robot implements Serializable {
 		super.update(); 
 	}
 	
-	/** Method findClosestBasicRobot - Finds the nearest basic robot in the arena
+	/** Method findClosestBasicRobot - This finds the nearest basic robot in the arena
 	 * 
 	 * @return The closest basicRobot, or null if none exist 
 	 */
@@ -98,7 +98,7 @@ public class PredatorRobot extends Robot implements Serializable {
 		return closestRobot; // return the closest robot, or null if none found
 	}
 	
-	/** Method draw - Draws the predator robot on the canvas 
+	/** Method draw - This draws the predator robot on the canvas 
 	 * Displays its unique animation frames
 	 * 
 	 * @param canvas - MyCanvas instance for rendering 
@@ -131,7 +131,7 @@ public class PredatorRobot extends Robot implements Serializable {
 		canvas.restore();
 	}
 	
-	/** Method getCurrentFrame - Retrieves the current animation frame
+	/** Method getCurrentFrame - This retrieves the current animation frame
 	 * 
 	 * @return The current image object representing the animation frame
 	 */

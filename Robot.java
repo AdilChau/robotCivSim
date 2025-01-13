@@ -53,7 +53,7 @@ public class Robot extends ArenaItem {
 		lastFrameTime = System.nanoTime(); // initialise the last frame
 	}
 	
-	/** Method update - to update the robot's position based on movement direction and handles animation frame
+	/** Method update - This is to update the robot's position based on movement direction and handles animation frame
 	 * Ensure that the robot stays with the boundaries of the arena and handles collisions
 	 * 
 	 */
@@ -100,7 +100,7 @@ public class Robot extends ArenaItem {
 	}
 	
 	
-	/** Method to draw the robot
+	/** Method draw - This is to draw the robot
 	 * Displays the current animation frame
 	 * Calculates angle to ensure assets face the direction they are moving
 	 * 
@@ -134,7 +134,7 @@ public class Robot extends ArenaItem {
 		canvas.restore();
 	
 	}
-	/** Method setPosition - Updates the robot's position
+	/** Method setPosition - This updates the robot's position
 	 * This method is used to set the private xPosition and yPosition
 	 * Reflection is used to modify the private fields securely
 	 * 
@@ -147,7 +147,7 @@ public class Robot extends ArenaItem {
 			super.setPosition(x, y, arenaWidth, arenaHeight); // Delegate to base class (ArenaItem)
 	}
 	
-	/** Method checkCollision - Checks if this robot is colliding with another item
+	/** Method checkCollision - This checks if this robot is colliding with another item
 	 * Uses the Euclidean distance formula to detect if two items are overlapping
 	 * 
 	 * @param item - The other ArenaItem to check collision with
@@ -183,7 +183,7 @@ public class Robot extends ArenaItem {
 	    };
 	}
 	
-	/** Method getCurrentFrame - Retrieves the current animation frame
+	/** Method getCurrentFrame - This retrieves the current animation frame
 	 * 
 	 * @return The current image object representing the animation frame
 	 */

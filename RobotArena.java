@@ -43,7 +43,7 @@ public class RobotArena implements Serializable {
 		items.add(item);
 	}
 	
-	/** Method drawArena - Draws the arena and all its items on the provided canvas
+	/** Method drawArena - This draws the arena and all its items on the provided canvas
 	 * 
 	 * @param canvas - MyCanvas object used for rendering
 	 */

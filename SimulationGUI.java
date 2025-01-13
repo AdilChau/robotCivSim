@@ -42,7 +42,7 @@ public class SimulationGUI extends Application {
 	private ArenaItem draggedItem = null; // currently dragged item
 	private boolean isDragging = false; // flag to track if an item is being dragged
 	
-	/** Method Start - sets up the JavaFX stage (the window) and Scene (the content)
+	/** Method Start - This sets up the JavaFX stage (the window) and Scene (the content)
 	 * 
 	 * @param stage - Primary stage for the application
 	 */
@@ -51,7 +51,7 @@ public class SimulationGUI extends Application {
 		// Initialise the RobotArena with default dimensions
 		arena = new RobotArena(800, 600);
 		
-		// Add sample items for testing
+		// Add items for default arena
 		arena.addItem(new Obstacle(200, 200, 30, "tree")); // add an obstacle
 		arena.addItem(new Robot(400, 300, 20, arena)); // add a robot
 		arena.addItem(new SmartRobot(100, 100, 20, arena)); // add a SmartRobot
@@ -62,7 +62,7 @@ public class SimulationGUI extends Application {
 		// Create and set up the canvas
 		Canvas drawCanvas = new Canvas(800, 600); // size matches the RobotArena
 		GraphicsContext gc = drawCanvas.getGraphicsContext2D();
-		canvas = new MyCanvas(gc, 800, 600);
+		canvas = new MyCanvas(gc, 800, 600); // create the canvas
 		
 		root.setCenter(drawCanvas); // add the canvas to the centre of the layout
 		
@@ -71,7 +71,7 @@ public class SimulationGUI extends Application {
 		ToolBar toolBar = createToolBar(); // create the toolbar
 		javafx.scene.layout.VBox topContainer = new javafx.scene.layout.VBox(menuBar, toolBar);
 		
-		root.setTop(topContainer); // add the canvas to the centre of the layout
+		root.setTop(topContainer); // add the toolbar to top of the canvas
 		
 		// Set up the scene and stage
 		Scene scene = new Scene(root, 800, 600);
@@ -88,7 +88,7 @@ public class SimulationGUI extends Application {
 				long adjustedInterval = (long)(16_666_667 / Math.max(speedMultiplier, 0.1)); // avoid division by zero
 				if (lastUpdate == 0 || now - lastUpdate >= adjustedInterval) {
 					for (ArenaItem item : arena.getItems()) {
-						item.update(); // Update the state of each item
+						item.update(); // update the state of each item
 					}
 					arena.processRemovals(); // process any scheduled removals
 					arena.drawArena(canvas); // draw the arena and items
@@ -108,7 +108,7 @@ public class SimulationGUI extends Application {
 	
 	/** Method CreateMenuBar - This sets up the menu bar with some placeholder options
 	 * 
-	 * @return MenuBar - The create menu bar
+	 * @return MenuBar - The created menu bar
 	 */
 	private MenuBar createMenuBar() {
 		MenuBar menuBar = new MenuBar(); // initialises menu bar object
@@ -138,10 +138,10 @@ public class SimulationGUI extends Application {
 		return menuBar;
 	}
 	
-	/** Method ToolBar - creates a toolbar with buttons for user interaction
+	/** Method ToolBar - This creates a toolbar with buttons for user interaction
 	 * Adds options to add robots, obstacles, and reset the canvas
 	 * 
-	 * @return ToolBar - The Created toolbar
+	 * @return ToolBar - The created toolbar
 	 */
 	private ToolBar createToolBar() {
 		// Create buttons
@@ -168,7 +168,7 @@ public class SimulationGUI extends Application {
 		// Update speed multiplier and label dynamically
 		speedSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
 			speedMultiplier = newVal.doubleValue(); // update speed multiplier
-			speedLabel.setText(String.format("Speed: %.1fx", speedMultiplier));; // update the speed label
+			speedLabel.setText(String.format("Speed: %.1fx", speedMultiplier));; // update the speed label dynamically
 		});
 		
 		// Add buttons to the toolbar
@@ -183,7 +183,7 @@ public class SimulationGUI extends Application {
 		return toolBar;
 	}
 	
-	/** Method addRobot - adds a robot of the specified type to the arena without overlapping any existing items
+	/** Method addRobot - This adds a robot of the specified type to the arena without overlapping any existing items
 	 * Validates the position to ensure no collisions with existing entities
 	 * 
 	 * @param type - The type of robot to add (e.g., "Basic", "Smart")
@@ -215,7 +215,7 @@ public class SimulationGUI extends Application {
 
 	}
 	
-	/** Method showRobotMenu - Displays a popup menu to choose robot type 
+	/** Method showRobotMenu - This displays a popup menu to choose robot type 
 	 * It allows for the user to select a specific robot to add out of available options(e.g., Basic, Smart)
 	 */
 	public void showRobotMenu() {
@@ -295,7 +295,7 @@ public class SimulationGUI extends Application {
 		dialog.showAndWait(); // show the dialog and wait for the user interaction
 	}
 	
-	/** Method addSpecificObstacle - Adds a specific obstacle to the arena
+	/** Method addSpecificObstacle - This adds a specific obstacle to the arena
 	 * Based on the type passed as a parameter
 	 * Ensures there is no overlap with existing items
 	 * 
@@ -485,7 +485,7 @@ public class SimulationGUI extends Application {
 	}
 	
 	
-	/** Method saveArenaToFile - Saves the current state of the arena to a file
+	/** Method saveArenaToFile - This saves the current state of the arena to a file
 	 * Opens a file chooser dialog for the user to specify the save location
 	 */
 	private void saveArenaToFile() {
@@ -503,7 +503,7 @@ public class SimulationGUI extends Application {
 		}
 	}
 	
-	/** Method loadArenaFromFile - Loads the state of the arena from a file selected by the user
+	/** Method loadArenaFromFile - This loads the state of the arena from a file selected by the user
 	 * Opens a file chooser dialog for the user to select a saved arena file
 	 */
 	private void loadArenaFromFile() {
@@ -522,7 +522,7 @@ public class SimulationGUI extends Application {
 		}
 	}
 	
-	/** Method togglePause - Toggles the animation between pause and play states
+	/** Method togglePause - This toggles the animation between pause and play states
 	 * Updates the button text and stops/starts the animation timer
 	 * 
 	 * @param button - The button to update its text based on the current state

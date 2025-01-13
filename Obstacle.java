@@ -25,7 +25,7 @@ public class Obstacle extends ArenaItem {
 		this.type = type.toLowerCase(); // initialises the type of the obstacle and normalises to lowercase for consistency
 	}
 	
-	/** Method to draw the obstacle
+	/** Method draw - This is to draw the obstacle
 	 * Draws the obstacle based on its type
 	 * 
 	 * @param canvas - MyCanvas instance for rendering
@@ -51,7 +51,7 @@ public class Obstacle extends ArenaItem {
 		}
 	}
 	
-	/** Method update - Does nothing as we want obstacles to remain static
+	/** Method update - This does nothing as we want obstacles to remain static
 	 * Ensures that obstacles do not move or change state
 	 */
 	@Override

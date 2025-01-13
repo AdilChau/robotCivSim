@@ -46,7 +46,7 @@ public class SmartRobot extends Robot {
 		lastFrameTime = System.nanoTime(); // initialise the last frame time
 	}
 	
-	/** Method draw - draws the smart robot on the canvas
+	/** Method draw - This draws the smart robot on the canvas
 	 * Displays the robot and its sensor beam
 	 * The beam changes colour based on detection status
 	 * 
@@ -93,7 +93,7 @@ public class SmartRobot extends Robot {
 		canvas.restore();
 	}
 	
-	/** Method update - Updates the smart robot's position and detection status
+	/** Method update - This updates the smart robot's position and detection status
 	 * The robot detects nearby objects and avoids them intelligently by steerimg
 	 */
 	@Override
@@ -238,7 +238,7 @@ public class SmartRobot extends Robot {
 	    };
 	}
 	
-	/** Method getCurrentFrame - Retrieves the current animation frame
+	/** Method getCurrentFrame - This retrieves the current animation frame
 	 * 
 	 * @return The current image object representing the animation frame
 	 */

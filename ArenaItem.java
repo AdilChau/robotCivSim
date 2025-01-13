@@ -26,7 +26,7 @@ public abstract class ArenaItem implements Serializable { // use of "abstract" f
 		this.radius = radius; // initialise radius
 	}
 	
-	/** Method getXPositon - to get the x-coordinate of the item
+	/** Method getXPositon - This gets the x-coordinate of the item
 	 * 
 	 * @return x-coordinate
 	 */
@@ -34,7 +34,7 @@ public abstract class ArenaItem implements Serializable { // use of "abstract" f
 		return xPosition; // get x pos
 	}
 	
-	/** Method getYPosition - to get the y-coordinate of the item
+	/** Method getYPosition - This gets the y-coordinate of the item
 	 * 
 	 * @return y-coordinate
 	 */
@@ -42,7 +42,7 @@ public abstract class ArenaItem implements Serializable { // use of "abstract" f
 		return yPosition; // get y pos
 	}
 	
-	/** Method getRadius - to get the radius of the item
+	/** Method getRadius - This gets the radius of the item
 	 * 
 	 * @return radius
 	 */
