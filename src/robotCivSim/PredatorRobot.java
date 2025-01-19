@@ -1,4 +1,4 @@
-package robotSimGUI;
+package robotCivSim;
 
 import javafx.scene.image.Image;
 
@@ -30,10 +30,10 @@ public class PredatorRobot extends Robot implements Serializable {
 		
 		// Load animation frames
 		frames = new Image[] {
-				new Image("file:src/robotSimGUI/Assets/predatorRobotFrame1.png"),
-				new Image("file:src/robotSimGUI/Assets/predatorRobotFrame2.png"),
-				new Image("file:src/robotSimGUI/Assets/predatorRobotFrame3.png"),
-				new Image("file:src/robotSimGUI/Assets/predatorRobotFrame4.png")
+				new Image("file:src/robotCivSim/Assets/predatorRobotFrame1.png"),
+				new Image("file:src/robotCivSim/Assets/predatorRobotFrame2.png"),
+				new Image("file:src/robotCivSim/Assets/predatorRobotFrame3.png"),
+				new Image("file:src/robotCivSim/Assets/predatorRobotFrame4.png")
 		};
 	}
 
@@ -165,10 +165,10 @@ public class PredatorRobot extends Robot implements Serializable {
 	    
 	    // Reinitialise the transient frames array
 	    frames = new Image[] {
-	        new Image("file:src/robotSimGUI/Assets/predatorRobotFrame1.png"),
-	        new Image("file:src/robotSimGUI/Assets/predatorRobotFrame2.png"),
-	        new Image("file:src/robotSimGUI/Assets/predatorRobotFrame3.png"),
-	        new Image("file:src/robotSimGUI/Assets/predatorRobotFrame4.png")
+	        new Image("file:src/robotCivSim/Assets/predatorRobotFrame1.png"),
+	        new Image("file:src/robotCivSim/Assets/predatorRobotFrame2.png"),
+	        new Image("file:src/robotCivSim/Assets/predatorRobotFrame3.png"),
+	        new Image("file:src/robotCivSim/Assets/predatorRobotFrame4.png")
 	    };
 	}
 }

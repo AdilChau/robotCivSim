@@ -1,4 +1,4 @@
-package robotSimGUI;
+package robotCivSim;
 
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color; // For drawing the light beam
@@ -37,10 +37,10 @@ public class SmartRobot extends Robot {
 		
 		// Load animation frames for the SmartRobot
 		frames = new Image[] {
-				new Image("file:src/robotSimGUI/Assets/smartRobotFrame1.png"),
-				new Image("file:src/robotSimGUI/Assets/smartRobotFrame2.png"),
-				new Image("file:src/robotSimGUI/Assets/smartRobotFrame3.png"),
-				new Image("file:src/robotSimGUI/Assets/smartRobotFrame4.png")
+				new Image("file:src/robotCivSim/Assets/smartRobotFrame1.png"),
+				new Image("file:src/robotCivSim/Assets/smartRobotFrame2.png"),
+				new Image("file:src/robotCivSim/Assets/smartRobotFrame3.png"),
+				new Image("file:src/robotCivSim/Assets/smartRobotFrame4.png")
 		};
 		currentFrameIndex = 0; // start with the first frame
 		lastFrameTime = System.nanoTime(); // initialise the last frame time
@@ -231,10 +231,10 @@ public class SmartRobot extends Robot {
 	    
 	    // Reinitialise the frames array
 	    frames = new Image[] {
-	        new Image("file:src/robotSimGUI/Assets/smartRobotFrame1.png"),
-	        new Image("file:src/robotSimGUI/Assets/smartRobotFrame2.png"),
-	        new Image("file:src/robotSimGUI/Assets/smartRobotFrame3.png"),
-	        new Image("file:src/robotSimGUI/Assets/smartRobotFrame4.png")
+	        new Image("file:src/robotCivSim/Assets/smartRobotFrame1.png"),
+	        new Image("file:src/robotCivSim/Assets/smartRobotFrame2.png"),
+	        new Image("file:src/robotCivSim/Assets/smartRobotFrame3.png"),
+	        new Image("file:src/robotCivSim/Assets/smartRobotFrame4.png")
 	    };
 	}
 	

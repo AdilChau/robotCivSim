@@ -1,4 +1,4 @@
-package robotSimGUI;
+package robotCivSim;
 
 import java.util.ArrayList; // import ArrayList
 import java.util.HashSet; // for unique removal tracking

@@ -1,4 +1,4 @@
-package robotSimGUI;
+package robotCivSim;
 
 //Import necessary built-in classes for MyCanvas
 import javafx.scene.canvas.GraphicsContext;

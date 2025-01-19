@@ -1,4 +1,4 @@
-package robotSimGUI;
+package robotCivSim;
 
 /** Enum RobotType - Represents the different types of robots available in the simulation.
  */

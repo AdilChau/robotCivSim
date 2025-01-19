@@ -1,4 +1,4 @@
-package robotSimGUI;
+package robotCivSim;
 
 import javafx.scene.image.Image; // to add assets
 
@@ -44,10 +44,10 @@ public class Robot extends ArenaItem {
 	
 		// Load animation frames
 		frames = new Image[] {
-			    new Image("file:src/robotSimGUI/Assets/basicRobotFrame1.png"),
-			    new Image("file:src/robotSimGUI/Assets/basicRobotFrame2.png"),
-			    new Image("file:src/robotSimGUI/Assets/basicRobotFrame3.png"),
-			    new Image("file:src/robotSimGUI/Assets/basicRobotFrame4.png")
+			    new Image("file:src/robotCivSim/Assets/basicRobotFrame1.png"),
+			    new Image("file:src/robotCivSim/Assets/basicRobotFrame2.png"),
+			    new Image("file:src/robotCivSim/Assets/basicRobotFrame3.png"),
+			    new Image("file:src/robotCivSim/Assets/basicRobotFrame4.png")
 		};
 		currentFrameIndex = 0; // start with the first frame
 		lastFrameTime = System.nanoTime(); // initialise the last frame
@@ -138,8 +138,8 @@ public class Robot extends ArenaItem {
 	 * This method is used to set the private xPosition and yPosition
 	 * Reflection is used to modify the private fields securely
 	 * 
-	 * @param x = New x-coordinate
-	 * @param y = New y-coordinate
+	 * @param x - New x-coordinate
+	 * @param y - New y-coordinate
 	 * @param arenaWidth - Width of the arena
 	 * @param arenaHeight - height of the arena
 	 */
@@ -176,10 +176,10 @@ public class Robot extends ArenaItem {
 	    
 	    // Reinitialise the transient frames array
 	    frames = new Image[] {
-	        new Image("file:src/robotSimGUI/Assets/basicRobotFrame1.png"),
-	        new Image("file:src/robotSimGUI/Assets/basicRobotFrame2.png"),
-	        new Image("file:src/robotSimGUI/Assets/basicRobotFrame3.png"),
-	        new Image("file:src/robotSimGUI/Assets/basicRobotFrame4.png")
+	        new Image("file:src/robotCivSim/Assets/basicRobotFrame1.png"),
+	        new Image("file:src/robotCivSim/Assets/basicRobotFrame2.png"),
+	        new Image("file:src/robotCivSim/Assets/basicRobotFrame3.png"),
+	        new Image("file:src/robotCivSim/Assets/basicRobotFrame4.png")
 	    };
 	}
 	

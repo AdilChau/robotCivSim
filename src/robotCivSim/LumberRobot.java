@@ -1,4 +1,4 @@
-package robotSimGUI;
+package robotCivSim;
 
 import javafx.scene.image.Image;
 
@@ -30,10 +30,10 @@ public class LumberRobot extends Robot implements Serializable {
 		
 		// Load animation frames
 		frames = new Image[]{
-	            new Image("file:src/robotSimGUI/Assets/lumberRobotFrame1.png"),
-	            new Image("file:src/robotSimGUI/Assets/lumberRobotFrame2.png"),
-	            new Image("file:src/robotSimGUI/Assets/lumberRobotFrame3.png"),
-	            new Image("file:src/robotSimGUI/Assets/lumberRobotFrame4.png")
+	            new Image("file:src/robotCivSim/Assets/lumberRobotFrame1.png"),
+	            new Image("file:src/robotCivSim/Assets/lumberRobotFrame2.png"),
+	            new Image("file:src/robotCivSim/Assets/lumberRobotFrame3.png"),
+	            new Image("file:src/robotCivSim/Assets/lumberRobotFrame4.png")
 	    };
 	}
 	
@@ -163,10 +163,10 @@ public class LumberRobot extends Robot implements Serializable {
 	    
 	    // Reinitialise the transient frames array
 	    frames = new Image[] {
-	        new Image("file:src/robotSimGUI/Assets/lumberRobotFrame1.png"),
-	        new Image("file:src/robotSimGUI/Assets/lumberRobotFrame2.png"),
-	        new Image("file:src/robotSimGUI/Assets/lumberRobotFrame3.png"),
-	        new Image("file:src/robotSimGUI/Assets/lumberRobotFrame4.png")
+	        new Image("file:src/robotCivSim/Assets/lumberRobotFrame1.png"),
+	        new Image("file:src/robotCivSim/Assets/lumberRobotFrame2.png"),
+	        new Image("file:src/robotCivSim/Assets/lumberRobotFrame3.png"),
+	        new Image("file:src/robotCivSim/Assets/lumberRobotFrame4.png")
 	    };
 	}
 }

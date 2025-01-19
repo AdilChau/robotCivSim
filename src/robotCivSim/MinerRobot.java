@@ -1,4 +1,4 @@
-package robotSimGUI;
+package robotCivSim;
 
 import javafx.scene.image.Image;
 
@@ -30,10 +30,10 @@ public class MinerRobot extends Robot implements Serializable {
 		
 		// Load animation frames
 		frames = new Image[]{
-	            new Image("file:src/robotSimGUI/Assets/minerRobotFrame1.png"),
-	            new Image("file:src/robotSimGUI/Assets/minerRobotFrame2.png"),
-	            new Image("file:src/robotSimGUI/Assets/minerRobotFrame3.png"),
-	            new Image("file:src/robotSimGUI/Assets/minerRobotFrame4.png")
+	            new Image("file:src/robotCivSim/Assets/minerRobotFrame1.png"),
+	            new Image("file:src/robotCivSim/Assets/minerRobotFrame2.png"),
+	            new Image("file:src/robotCivSim/Assets/minerRobotFrame3.png"),
+	            new Image("file:src/robotCivSim/Assets/minerRobotFrame4.png")
 	    };
 	}
 	
@@ -163,10 +163,10 @@ public class MinerRobot extends Robot implements Serializable {
 	    
 	    // Reinitialise the transient frames array
 	    frames = new Image[] {
-	        new Image("file:src/robotSimGUI/Assets/minerRobotFrame1.png"),
-	        new Image("file:src/robotSimGUI/Assets/minerRobotFrame2.png"),
-	        new Image("file:src/robotSimGUI/Assets/minerRobotFrame3.png"),
-	        new Image("file:src/robotSimGUI/Assets/minerRobotFrame4.png")
+	        new Image("file:src/robotCivSim/Assets/minerRobotFrame1.png"),
+	        new Image("file:src/robotCivSim/Assets/minerRobotFrame2.png"),
+	        new Image("file:src/robotCivSim/Assets/minerRobotFrame3.png"),
+	        new Image("file:src/robotCivSim/Assets/minerRobotFrame4.png")
 	    };
 	}
 }

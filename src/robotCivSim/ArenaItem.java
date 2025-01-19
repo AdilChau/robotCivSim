@@ -1,4 +1,4 @@
-package robotSimGUI;
+package robotCivSim;
 
 import java.io.Serializable; // for file save and load
 

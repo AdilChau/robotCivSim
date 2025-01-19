@@ -1,4 +1,4 @@
-package robotSimGUI;
+package robotCivSim;
 
 import javafx.scene.image.Image; // for obstacle assets
 import javafx.scene.paint.Color; // for fallback
@@ -33,8 +33,8 @@ public class Obstacle extends ArenaItem {
 	@Override
 	public void draw(MyCanvas canvas) {
 		Image obstacleImage = switch (type) {
-		case "tree" -> new Image(getClass().getResource("/robotSimGUI/Assets/treeObstacle.png").toExternalForm());
-		case "rock" -> new Image(getClass().getResource("/robotSimGUI/Assets/rockObstacle.png").toExternalForm());
+		case "tree" -> new Image(getClass().getResource("/robotCivSim/Assets/treeObstacle.png").toExternalForm());
+		case "rock" -> new Image(getClass().getResource("/robotCivSim/Assets/rockObstacle.png").toExternalForm());
 		default -> null;
 		};
 		
@@ -73,8 +73,8 @@ public class Obstacle extends ArenaItem {
 	 */
 	public Image getImage() {
 		return switch (type.toLowerCase()) {
-        	case "tree" -> new Image(getClass().getResource("/robotSimGUI/Assets/treeObstacle.png").toExternalForm()); // retrieves tree image
-        	case "rock" -> new Image(getClass().getResource("/robotSimGUI/Assets/rockObstacle.png").toExternalForm()); // retrieves rock image
+        	case "tree" -> new Image(getClass().getResource("/robotCivSim/Assets/treeObstacle.png").toExternalForm()); // retrieves tree image
+        	case "rock" -> new Image(getClass().getResource("/robotCivSim/Assets/rockObstacle.png").toExternalForm()); // retrieves rock image
         	default -> null; // default to null if the type selected is invalid
 		};
 	}

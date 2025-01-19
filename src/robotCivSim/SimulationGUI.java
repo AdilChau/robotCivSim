@@ -1,4 +1,4 @@
-package robotSimGUI;
+package robotCivSim;
 
 // Import necessary built-in classes for GUI
 import javafx.application.Application;
@@ -545,6 +545,6 @@ public class SimulationGUI extends Application {
 	 * @param args - Command-line arguments.
 	 */
 	public static void main(String[] args) {
-		launch(args);
+		Application.launch(args);
 	}
 }
