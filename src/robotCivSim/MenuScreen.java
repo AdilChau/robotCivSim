@@ -2,7 +2,8 @@ package robotCivSim;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -31,11 +32,11 @@ public class MenuScreen {
 	public void show() {
 		// Create the "Start" button
 		Button startButton = new Button("START"); 
-        startButton.setStyle("-fx-font-size: 20px; -fx-background-color: #4CAF50; -fx-text-fill: white; " +
+        startButton.setStyle("-fx-font-size: 20px; -fx-background-color: #F2C444; -fx-text-fill: white; " +
                 "-fx-padding: 10px 20px; -fx-border-radius: 5; -fx-background-radius: 5;");
-        startButton.setOnMouseEntered(e -> startButton.setStyle("-fx-font-size: 22px; -fx-background-color: #45a049; " +
+        startButton.setOnMouseEntered(e -> startButton.setStyle("-fx-font-size: 22px; -fx-background-color: #F5A927; " +
                 "-fx-text-fill: white; -fx-padding: 12px 24px; -fx-border-radius: 5; -fx-background-radius: 5;"));
-        startButton.setOnMouseExited(e -> startButton.setStyle("-fx-font-size: 20px; -fx-background-color: #4CAF50; " +
+        startButton.setOnMouseExited(e -> startButton.setStyle("-fx-font-size: 20px; -fx-background-color: #F2C444; " +
                 "-fx-text-fill: white; -fx-padding: 10px 20px; -fx-border-radius: 5; -fx-background-radius: 5;"));
         
         // Define button action to transition into the default simulation screen
@@ -43,13 +44,27 @@ public class MenuScreen {
         	simulationGUI.initialiseSimulation(stage);
         });
         
+        // Create the "Exit" button
+        Button exitButton = new Button("EXIT");
+        exitButton.setStyle("-fx-font-size: 20px; -fx-background-color: #F2C444; -fx-text-fill: white; " +
+                "-fx-padding: 10px 20px; -fx-border-radius: 5; -fx-background-radius: 5;");
+        exitButton.setOnMouseEntered(event -> exitButton.setStyle("-fx-font-size: 22px; -fx-background-color: #F5A927; " +
+                "-fx-text-fill: white; -fx-padding: 12px 24px; -fx-border-radius: 5; -fx-background-radius: 5;"));
+        exitButton.setOnMouseExited(event -> exitButton.setStyle("-fx-font-size: 20px; -fx-background-color: #F2C444; " +
+                "-fx-text-fill: white; -fx-padding: 10px 20px; -fx-border-radius: 5; -fx-background-radius: 5;"));
+        
+        // Define button action to exit the simulation
+        exitButton.setOnAction(e -> {
+        	Platform.exit();
+        });
+        
         // Create layout and set the background colour
-        StackPane root = new StackPane();
-        root.setStyle("-fx-background-color: #f4f4f4;");
-        root.getChildren().add(startButton);
+        VBox layout = new VBox(15); // spacing between buttons
+        layout.setStyle("-fx-background-color: #0E2F5C; -fx-alignment: center");
+        layout.getChildren().addAll(startButton, exitButton);
         
         // Set up the scene
-        Scene menuScene = new Scene(root, 800, 600);
+        Scene menuScene = new Scene(layout, 800, 600, Color.WHITE);
         stage.setScene(menuScene);
         stage.setTitle("Robot Simulation Menu");
         stage.show();
