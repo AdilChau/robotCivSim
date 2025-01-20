@@ -2,6 +2,7 @@ package robotCivSim;
 
 // Import necessary built-in classes for GUI
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -42,19 +43,35 @@ public class SimulationGUI extends Application {
 	private ArenaItem draggedItem = null; // currently dragged item
 	private boolean isDragging = false; // flag to track if an item is being dragged
 	
-	/** Method Start - This sets up the JavaFX stage (the window) and Scene (the content)
+	/** Method Start - This sets up Menu stage and allows the user to proceed to the simulation
 	 * 
 	 * @param stage - Primary stage for the application
 	 */
 	@Override
 	public void start(Stage stage) {
-		// Initialise the RobotArena with default dimensions
-		arena = new RobotArena(800, 600);
-		
+		// Display show the menu screen
+		MenuScreen menuScreen = new MenuScreen(stage, this); // pass the current simulationGUI instance to MenuScreen
+		menuScreen.show();
+	}
+	
+	/** Method initialiseSimulation - This sets up the JavaFX stage (the window) and Scene (the content)
+	 * 
+	 * @param stage - Primary stage for the application
+	 */
+	public void initialiseSimulation(Stage stage) {
+		// Preserve the current window state (min/max screen)
+		boolean isMaximized = stage.isMaximized(); // Check if the window has been maximised
+	    double stageX = stage.getX();
+	    double stageY = stage.getY();
+	    double stageWidth = stage.getWidth();
+	    double stageHeight = stage.getHeight();
+	    System.out.println("Window maximized: " + isMaximized);
+	    
+		arena = new RobotArena(800, 600); // Initialise the arena
+	
 		// Add items for default arena
 		arena.addItem(new Obstacle(200, 200, 30, "tree")); // add an obstacle
 		arena.addItem(new Robot(400, 300, 20, arena)); // add a robot
-		arena.addItem(new SmartRobot(100, 100, 20, arena)); // add a SmartRobot
 		
 		// Set up the GUI Layout
 		BorderPane root = new BorderPane(); // root layout for the GUI
@@ -73,11 +90,29 @@ public class SimulationGUI extends Application {
 		
 		root.setTop(topContainer); // add the toolbar to top of the canvas
 		
+
+	    // Dynamically size the scene based on the current stage dimensions
+	    Scene scene = new Scene(root, stageWidth, stageHeight);
+		
 		// Set up the scene and stage
-		Scene scene = new Scene(root, 800, 600);
-		stage.setScene(scene);
-		stage.setTitle("Robot Simulation"); // changes title
-		stage.show();
+	    Platform.runLater(() -> {
+			stage.setScene(scene);
+			stage.setTitle("Robot Simulation"); // changes title
+			
+			// Restore the window position
+	        stage.setX(stageX);
+	        stage.setY(stageY);
+	        
+	        // Restore size if not maximised
+	        if (!isMaximized) {
+	            stage.setWidth(stageWidth);
+	            stage.setHeight(stageHeight);
+	        }
+	        
+	        // Restore the maximised state
+	        stage.setMaximized(isMaximized);
+
+	    });
 		
 		// Animation Timer for movement
 		timer = new AnimationTimer() {
@@ -545,6 +580,6 @@ public class SimulationGUI extends Application {
 	 * @param args - Command-line arguments.
 	 */
 	public static void main(String[] args) {
-		Application.launch(args);
+		launch(args);
 	}
 }
