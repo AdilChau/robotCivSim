@@ -1,1 +1,4 @@
 /bin/
+
+# Java module system
+module-info.java
