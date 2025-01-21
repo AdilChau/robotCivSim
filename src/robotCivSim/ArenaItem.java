@@ -12,6 +12,7 @@ public abstract class ArenaItem implements Serializable { // use of "abstract" f
 	private double xPosition; // x-coordinate
 	private double yPosition; // y-coordinate
 	private double radius; // radius for the item
+	private RobotArena arena; // reference to the RobotArena
 	
 	/** Constructor for ArenaItem
 	 * Initialises the item's positions and size.
@@ -34,12 +35,28 @@ public abstract class ArenaItem implements Serializable { // use of "abstract" f
 		return xPosition; // get x pos
 	}
 	
+	/** Method setXPosition - This sets the x-coordinate of the item
+	 * 
+	 * @param xPosition
+	 */
+	public void setXPosition(double xPosition) {
+		this.xPosition = xPosition; // set x position
+	}
+	
 	/** Method getYPosition - This gets the y-coordinate of the item
 	 * 
 	 * @return y-coordinate
 	 */
 	public double getYPosition() {
 		return yPosition; // get y pos
+	}
+	
+	/** Method setYPosition - This sets the x-coordinate of the item
+	 * 
+	 * @param yPosition
+	 */
+	public void setYPosition(double xPosition) {
+		this.yPosition = xPosition; // set y position
 	}
 	
 	/** Method getRadius - This gets the radius of the item
@@ -50,6 +67,33 @@ public abstract class ArenaItem implements Serializable { // use of "abstract" f
 		return radius; // get radius
 	}
 	
+	/**
+	 * Method setRadius - This sets the radius of the item
+	 * 
+	 * @param radius - New radius of the item
+	 */
+	public void setRadius(double radius) {
+		this.radius = radius; // set y position
+	}
+	
+	/**
+	 * Method getArena - This gets the arena reference
+	 * 
+	 * @return the RobotArena reference
+	 */
+	public RobotArena getArena() {
+		return arena;
+	}
+	
+	/**
+	 * Method setArena - This gets the arena reference
+	 * 
+	 * @param arena - The RobotArena to which this item belongs
+	 */
+    public void setArena(RobotArena arena) {
+        this.arena = arena;
+    }
+    
 	/** Abstract method to be implemented by subclasses for drawing the item
 	 * 
 	 * @return void
@@ -99,6 +143,12 @@ public abstract class ArenaItem implements Serializable { // use of "abstract" f
 		}
 	}
 	
+	/**
+	 * Method destroy - This is an abstract method that handles the logic for when the item is destroyed
+	 */
+	public abstract void destroy();
+	
+	
 	/** Method getName - This retrieves the name of the item (this is overridden in subclasses)
 	 * 
 	 * @return a string which represents the name of the item
@@ -114,4 +164,6 @@ public abstract class ArenaItem implements Serializable { // use of "abstract" f
 	public String getDescription() {
 		return "A normal item in the arena.";
 	}
+	
+	
 }

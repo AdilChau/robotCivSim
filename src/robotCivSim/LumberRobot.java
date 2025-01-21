@@ -14,6 +14,19 @@ public class LumberRobot extends Robot implements Serializable {
 	private static final long serialVersionUID = 1L; // serialisation ID
 	private Obstacle targetTree; // the current tree target
 	private transient Image[] frames; // animation frames for the LumberRobot (transient for serialisation)
+	private long lastActionTime = 0; // tracks the last time a resource was collected or atree was destroyed
+	
+	/** 
+	 * Enum state for prioritising tasks
+	 */
+	private enum State {
+		COLLECTING_RESOURCE,
+		TARGETING_TREE,
+		DEFAULT_BEHAVIOR, 
+		IDLE
+	}
+	
+	private State currentState = State.IDLE; // initial state
 	
 	/** Constructor for LumberRobot
 	 * Initialises the LumberRobot with position, size, and reference to arena
@@ -38,36 +51,133 @@ public class LumberRobot extends Robot implements Serializable {
 	}
 	
 	/** Method update - This updates the LumberRobot's behaviour 
-	 * The robot targets and removes trees, or behaves like a normal robot if there are no trees
+	 * The robot targets and removes trees then collects their wood, or behaves like a normal robot if there are no trees
 	 */
 	@Override
 	public void update() {
-		// If no target or target is removed, find the closest tree
-		if (targetTree == null || !arena.getItems().contains(targetTree)) {
-			targetTree = findClosestTree(); // find a new target
-		}
-		
-		// If a target exists, move toward it
-		if (targetTree!= null) {
-			double dxToTarget = targetTree.getXPosition() - getXPosition(); // horizontal distance
-			double dyToTarget = targetTree.getYPosition() - getYPosition(); // vertical distance
-			double distance = Math.sqrt((dxToTarget * dxToTarget + dyToTarget * dyToTarget)); // calculate distance
-			
-			// If close enough to the tree, "chop" it
-			if (distance < getRadius() + targetTree.getRadius()) {
-				arena.scheduleRemoval(targetTree); // schedule tree removal
-				targetTree = null; // reset the target
-			} else {
-				// Move toward the tree
-				double angleToTarget = Math.atan2(dyToTarget, dxToTarget); // calculate angle
-				dx = Math.cos(angleToTarget) * speed; // update horizontal speed
-				dy = Math.sin(angleToTarget) * speed; // update vertical speed
-			}
-		}
-		
-		// Fall back to normal robot behaviour if no target exists
-		super.update();
+	    long currentTime = System.currentTimeMillis();
+
+	    // Handle state-based behaviour
+	    switch (currentState) {
+	        case COLLECTING_RESOURCE:
+	            handleCollectingResource(currentTime);
+	            break;
+
+	        case TARGETING_TREE:
+	            handleTargetingTree(currentTime);
+	            break;
+
+	        case DEFAULT_BEHAVIOR:
+	            super.update(); // use BasicRobot's default update behaviour
+	            break;    
+	            
+	        case IDLE:
+	            findNextTask(currentTime);
+	            break;
+	    }
+
+	    // Handle collisions
+	    for (ArenaItem item : arena.getItems()) {
+	        if (item instanceof ResourceItem || item instanceof Obstacle) continue; // Skip trees and resources
+	        if (item != this && checkCollision(item)) {
+	            dx = -dx;
+	            dy = -dy;
+	            break;
+	        }
+	    }
 	}
+
+	/** Method handleCollectingResource - This is for the collecting resources 
+	 * 
+	 * @param currentTime 
+	 */
+	private void handleCollectingResource(long currentTime) {
+	    ResourceItem resourceToCollect = findClosestResource();
+	    if (resourceToCollect == null || !resourceToCollect.isReadyToCollect()) {
+	        currentState = State.IDLE; // go back to idle if no resource to collect
+	        return;
+	    }
+	
+	    double dxToResource = resourceToCollect.getXPosition() - getXPosition();
+	    double dyToResource = resourceToCollect.getYPosition() - getYPosition();
+	    double distanceToResource = Math.sqrt(dxToResource * dxToResource + dyToResource * dyToResource);
+	
+	    if (distanceToResource < getRadius() + resourceToCollect.getRadius()) {
+	    	arena.scheduleRemoval(resourceToCollect); // schedule removal
+	        resourceToCollect.destroy(); // collect the resource 
+	        lastActionTime = currentTime; // set cooldown
+	        currentState = State.IDLE; // return to idle after collecting 
+	    } else {
+	        double angleToResource = Math.atan2(dyToResource, dxToResource);
+	        dx = Math.cos(angleToResource) * speed;
+	        dy = Math.sin(angleToResource) * speed;
+	
+	        setXPosition(getXPosition() + dx);
+	        setYPosition(getYPosition() + dy);
+	    }
+	}
+	
+	/** Method handleTargetingTree - This is for targeting trees
+	 * 
+	 * @param currentTime 
+	 */
+	private void handleTargetingTree(long currentTime) {
+	    if (targetTree == null || !arena.getItems().contains(targetTree)) {
+	        targetTree = findClosestTree();
+	    }
+
+	    if (targetTree == null) {
+	        currentState = State.IDLE; // no tree to target
+	        return;
+	    }
+
+	    double dxToTarget = targetTree.getXPosition() - getXPosition();
+	    double dyToTarget = targetTree.getYPosition() - getYPosition();
+	    double distanceToTarget = Math.sqrt(dxToTarget * dxToTarget + dyToTarget * dyToTarget);
+
+	    if (distanceToTarget < getRadius() + targetTree.getRadius()) {
+	        targetTree.destroy(); // chop tree and drop resource
+	        lastActionTime = currentTime; // set cooldown
+	        targetTree = null;
+	        currentState = State.IDLE; // return to idle after chopping
+	    } else {
+	        double angleToTarget = Math.atan2(dyToTarget, dxToTarget);
+	        dx = Math.cos(angleToTarget) * speed;
+	        dy = Math.sin(angleToTarget) * speed;
+
+	        setXPosition(getXPosition() + dx);
+	        setYPosition(getYPosition() + dy);
+	    }
+	}
+
+	/** Method findNextTask - This is for finding the next task
+	 * 
+	 * @param currentTime 
+	 */
+	private void findNextTask(long currentTime) {
+	    // Wait during cooldown
+	    if (currentTime - lastActionTime < 1000) {
+	    	return;
+	    }
+	    
+	    ResourceItem closestResource = findClosestResource();
+	    if (closestResource != null && closestResource.isReadyToCollect()) {
+	        currentState = State.COLLECTING_RESOURCE; // prioritise resource collection
+	        return;
+	    } 
+	    
+	    // If no resource, look for the nearest tree
+        targetTree = findClosestTree();
+	    if (targetTree != null) {
+	          currentState = State.TARGETING_TREE; // target tree if no resource
+	          return;
+	    } 
+	    
+	    // If no tasks are available, go idle
+	    currentState = State.DEFAULT_BEHAVIOR; // stay idle if no task available
+	}
+	
+
 	
 	/** Method findClosestTree - This finds the nearest tree in the arena 
 	 * 
@@ -95,6 +205,34 @@ public class LumberRobot extends Robot implements Serializable {
 		
 		return closestTree; // return the closest tree, or null if none found
 	}
+	
+	/** Method findClosestResource - This finds the nearest wood resource in the arena 
+	 * 
+	 * @return The closest wood resource, or null if none exists
+	 */
+	private ResourceItem findClosestResource() {
+	    ResourceItem closestResource = null;
+	    double closestDistance = Double.MAX_VALUE;
+
+	    // Iterate through all items in the arena
+	    for (ArenaItem item : arena.getItems()) {
+	        if (item instanceof ResourceItem) { // Only consider resources
+	            ResourceItem resource = (ResourceItem) item;
+	            double dx = resource.getXPosition() - getXPosition();
+	            double dy = resource.getYPosition() - getYPosition();
+	            double distance = Math.sqrt(dx * dx + dy * dy);
+
+	            // Check if this resource is closer
+	            if (distance < closestDistance) {
+	                closestDistance = distance;
+	                closestResource = resource;
+	            }
+	        }
+	    }
+
+	    return closestResource; // Return the closest resource, or null if none exist
+	}
+
 	
 	/** Method draw - This draws the LumberRobot on the canvas
 	 * It displays its unique animation frames.

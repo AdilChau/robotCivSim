@@ -74,12 +74,15 @@ public class Robot extends ArenaItem {
 		for (ArenaItem item : arena.getItems()) {
 			// If a collision is detected, reverse the direction of the robot
 			if (item != this && checkCollision(item)) {
-				dx = -dx; // reverse the x-direction
-				dy = -dy; // reverse the y-direction
+				// Apply small random offset to avoid repetitive collisions
+		        double angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * Math.PI / 4; // add a small random angle
+		        dx = Math.cos(angle) * speed; // update dx with adjusted direction
+		        dy = Math.sin(angle) * speed; // update dy with adjusted direction
 				
 				// Move slightly to prevent getting stuck in a collision
 				newX += dx * 2; // adjust x-position
 				newY += dy * 2; // adjust y-position
+		        System.out.println(getName() + " collided with " + item.getName() + " and adjusted direction to (" + dx + ", " + dy + ")");
 				break; // only handle one collision at a time
 			}
 		}
@@ -87,11 +90,13 @@ public class Robot extends ArenaItem {
 		// Logic to "bounce" of walls
 		if (newX < getRadius() || newX > arena.getWidth() - getRadius()) { // reverse the x-direction if either condition is met
 			dx = -dx; // reverse the x-direction on hitting the left or right boundary
+			dy += (Math.random() - 0.5) * 0.1; // add a small random offset to dy
 			newX = Math.max(getRadius(), Math.min(newX, arena.getWidth() - getRadius()));
 		}
 		
 		if (newY < getRadius() || newY > arena.getHeight() - getRadius()) { // reverse the y-direction if either condition is met
 			dy = -dy; // reverse the y-direction on hitting a top or bottom boundary
+			dx += (Math.random() - 0.5) * 0.1; // add a small random offset to dx
 			newY = Math.max(getRadius(), Math.min(newY, arena.getHeight() - getRadius()));
 		}
 		
@@ -153,15 +158,29 @@ public class Robot extends ArenaItem {
 	 * @param item - The other ArenaItem to check collision with
 	 * @return true if a collision is detected, otherwise return false
 	 */
-	private boolean checkCollision(ArenaItem item) {
+	protected boolean checkCollision(ArenaItem item) {
 		// Calculate the distance between the current robot and other item
 		double dx = getXPosition() - item.getXPosition(); // difference in x-coordinates
 		double dy = getYPosition() - item.getYPosition(); // difference in y-coordinates
 		double distance = Math.sqrt(dx * dx + dy * dy); // compute Euclidean distance
+		double collisionBuffer = 0.1 * getRadius(); // add a small buffer
 		
-		// Check if the distance is less than the sum of the radii (including a collision)
-		return distance < (getRadius() + item.getRadius());
+		boolean collision = distance < (getRadius() + item.getRadius() - collisionBuffer); 
+		if (collision) {
+			System.out.println(getName() + " collided with " + item.getName() + " at (" + getXPosition() + ", " + getYPosition() + ")");
+		}
+		return collision;
 	}
+	
+	/**
+	 * This default method is so that the Lumber and Miner robots can have destroy functionality
+	 */
+	@Override
+	public void destroy() {
+	    // Default behaviour: do nothing
+	    throw new UnsupportedOperationException("This robot does not have destroy capabilities.");
+	}
+
 	
 	/** Method writeObject - This serialises non-transient fields
 	 */

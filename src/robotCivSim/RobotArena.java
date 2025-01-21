@@ -21,6 +21,7 @@ public class RobotArena implements Serializable {
 	private double height; // height of arena
 	private ArrayList<ArenaItem> items; // make an ArrayList of ArenaItems
 	private transient HashSet<ArenaItem> itemsToRemove; // transient to avoid serialisation
+	private transient List<ArenaItem> itemsToAdd = new ArrayList<>(); // list of items to add
 	
 	/** Constructor for RobotArena 
 	 * Initialises the arena with specified dimensions and an empty list of items
@@ -40,6 +41,7 @@ public class RobotArena implements Serializable {
 	 * @param item - the ArenaItem to be added
 	 */
 	public void addItem(ArenaItem item) {
+		item.setArena(this); // set the arena reference
 		items.add(item);
 	}
 	
@@ -141,13 +143,34 @@ public class RobotArena implements Serializable {
 		itemsToRemove.add(item); // add to removal set
 	}
 	
+	/** Method scheduleAddition - Schedules an item to be added after iteration is complete
+	 * 
+	 * @param item - The ArenaItem to be added
+	 */
+	public void scheduleAddition(ArenaItem item) {
+		if (itemsToAdd == null) {
+			itemsToAdd = new ArrayList<>();
+		}
+		itemsToAdd.add(item);
+	}
+	
 	/** Method processRemovals - This removes all items that are marked for removal
 	 * It ensures a safe removal of items after iteration (Helped fix ConcurrentModification error)
 	 */
 	public void processRemovals() {
-		items.removeAll(itemsToRemove); // remove all scheduled items
-		itemsToRemove.clear(); // clear the removal sets
+	    // Remove all scheduled items
+	    if (itemsToRemove != null) {
+	        items.removeAll(itemsToRemove); // remove all scheduled items
+	        itemsToRemove.clear(); // clear the removal set
+	    }
+
+	    // Add all scheduled items
+	    if (itemsToAdd != null && !itemsToAdd.isEmpty()) {
+	        items.addAll(itemsToAdd); // add all scheduled items
+	        itemsToAdd.clear(); // clear the addition set
+	    }
 	}
+	
 	
 	/** Method to deserialise the logic for RobotArena
 	 * This method ensures that transient fields, such as itemsToRemove are properly reinitialised after deserialisation
@@ -160,6 +183,7 @@ public class RobotArena implements Serializable {
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
 	    ois.defaultReadObject();
 	    itemsToRemove = new HashSet<>(); // reinitialize transient field
+	    itemsToAdd = new ArrayList<>(); // ensure itemsToAdd is initialised
 	}
 	
 	/** Method findItemAt - This finds the item at the given coordinates
@@ -181,6 +205,16 @@ public class RobotArena implements Serializable {
 		}
 		return null; // no item found
 	}
+	
+	/**
+	 * Method removeItem - Removes an item from the arena.
+	 * 
+	 * @param item - The ArenaItem to be removed
+	 */
+	public void removeItem(ArenaItem item) {
+	    items.remove(item); // remove the item from the list
+	}
+
 
 }
 
