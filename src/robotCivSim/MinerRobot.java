@@ -1,10 +1,10 @@
 package robotCivSim;
 
 import javafx.scene.image.Image;
-
 import java.io.IOException; // for file save and load
 import java.io.ObjectInputStream; // for file save and load
 import java.io.Serializable; // for file save and load
+
 
 
 /** MinerRoboot - A robot that targets rocks and removes them on collision.
@@ -14,6 +14,19 @@ public class MinerRobot extends Robot implements Serializable {
 	private static final long serialVersionUID = 1L; // serialisation ID
 	private Obstacle targetRock; // the current rock target
 	private transient Image[] frames; // animation frames for the MienrRobot (transient for serialisation)
+	private long lastActionTime = 0;
+	
+	/** 
+	 * Enum state for prioritising tasks
+	 */
+	private enum State {
+		COLLECTING_RESOURCE,
+		TARGETING_ROCK,
+		DEFAULT_BEHAVIOR, 
+		IDLE
+	}
+	
+	private State currentState = State.IDLE; // initial state
 	
 	/** Constructor for MinerRobot
 	 * Initialises the MinerRobot with position, size, and reference to arena
@@ -38,36 +51,133 @@ public class MinerRobot extends Robot implements Serializable {
 	}
 	
 	/** Method update - This updates the MinerRobot's behaviour 
-	 * The robot targets and removes rocks, or behaves like a normal robot if there are no rocks
+	 * The robot targets and removes rocks then collects their rock, or behaves like a normal robot if there are no rocks
 	 */
 	@Override
 	public void update() {
-		// If no target or target is removed, find the closest rock
-		if (targetRock == null || !arena.getItems().contains(targetRock)) {
-			targetRock = findClosestRock(); // find a new target
-		}
-		
-		// If a target exists, move toward it
-		if (targetRock!= null) {
-			double dxToTarget = targetRock.getXPosition() - getXPosition(); // horizontal distance
-			double dyToTarget = targetRock.getYPosition() - getYPosition(); // vertical distance
-			double distance = Math.sqrt((dxToTarget * dxToTarget + dyToTarget * dyToTarget)); // calculate distance
-			
-			// If close enough to the rock, "mine" it
-			if (distance < getRadius() + targetRock.getRadius()) {
-				arena.scheduleRemoval(targetRock); // schedule rock removal
-				targetRock = null; // reset the target
-			} else {
-				// Move toward the rock
-				double angleToTarget = Math.atan2(dyToTarget, dxToTarget); // calculate angle
-				dx = Math.cos(angleToTarget) * speed; // update horizontal speed
-				dy = Math.sin(angleToTarget) * speed; // update vertical speed
-			}
-		}
-		
-		// Fall back to normal robot behaviour if no target exists
-		super.update();
+	    long currentTime = System.currentTimeMillis();
+
+	    // Handle state-based behaviour
+	    switch (currentState) {
+	        case COLLECTING_RESOURCE:
+	            handleCollectingResource(currentTime);
+	            break;
+
+	        case TARGETING_ROCK:
+	            handleTargetingRock(currentTime);
+	            break;
+
+	        case DEFAULT_BEHAVIOR:
+	            super.update(); // use BasicRobot's default update behaviour
+	            findNextTask(currentTime);
+	            break;    
+	            
+	        case IDLE:
+	            findNextTask(currentTime);
+	            break;
+	    }
+
+	    // Handle collisions
+	    for (ArenaItem item : arena.getItems()) {
+	        if (item instanceof ResourceItem || item instanceof Obstacle) continue; // Skip rocks and resources
+	        if (item != this && checkCollision(item)) {
+	            dx = -dx;
+	            dy = -dy;
+	            break;
+	        }
+	    }
 	}
+
+	/** Method handleCollectingResource - This is for the collecting resources 
+	 * 
+	 * @param currentTime 
+	 */
+	private void handleCollectingResource(long currentTime) {
+	    ResourceItem resourceToCollect = findClosestResource();
+	    if (resourceToCollect == null || !resourceToCollect.isReadyToCollect()) {
+	        currentState = State.IDLE; // go back to idle if no resource to collect
+	        return;
+	    }
+	
+	    double dxToResource = resourceToCollect.getXPosition() - getXPosition();
+	    double dyToResource = resourceToCollect.getYPosition() - getYPosition();
+	    double distanceToResource = Math.sqrt(dxToResource * dxToResource + dyToResource * dyToResource);
+	
+	    if (distanceToResource < getRadius() + resourceToCollect.getRadius()) {
+	    	arena.scheduleRemoval(resourceToCollect); // schedule removal
+	        resourceToCollect.destroy(); // collect the resource 
+	        lastActionTime = currentTime; // set cooldown
+	        currentState = State.IDLE; // return to idle after collecting 
+	    } else {
+	        double angleToResource = Math.atan2(dyToResource, dxToResource);
+	        dx = Math.cos(angleToResource) * speed;
+	        dy = Math.sin(angleToResource) * speed;
+	
+	        setXPosition(getXPosition() + dx);
+	        setYPosition(getYPosition() + dy);
+	    }
+	}
+		
+	/** Method handleTargetingRock - This is for targeting rocks
+	 * 
+	 * @param currentTime 
+	 */
+	private void handleTargetingRock(long currentTime) {
+	    if (targetRock == null || !arena.getItems().contains(targetRock)) {
+	        targetRock = findClosestRock();
+	    }
+
+	    if (targetRock == null) {
+	        currentState = State.DEFAULT_BEHAVIOR; // no rock to target
+	        return;
+	    }
+
+	    double dxToTarget = targetRock.getXPosition() - getXPosition();
+	    double dyToTarget = targetRock.getYPosition() - getYPosition();
+	    double distanceToTarget = Math.sqrt(dxToTarget * dxToTarget + dyToTarget * dyToTarget);
+
+	    if (distanceToTarget < getRadius() + targetRock.getRadius()) {
+	        targetRock.destroy(); // mine rock and drop resource
+	        lastActionTime = currentTime; // set cooldown
+	        targetRock = null;
+	        currentState = State.IDLE; // return to idle after mining
+	    } else {
+	        double angleToTarget = Math.atan2(dyToTarget, dxToTarget);
+	        dx = Math.cos(angleToTarget) * speed;
+	        dy = Math.sin(angleToTarget) * speed;
+
+	        setXPosition(getXPosition() + dx);
+	        setYPosition(getYPosition() + dy);
+	    }
+	}
+	
+	/** Method findNextTask - This is for finding the next task
+	 * 
+	 * @param currentTime 
+	 */
+	private void findNextTask(long currentTime) {
+	    // Wait during cooldown
+	    if (currentTime - lastActionTime < 1000) {
+	    	return;
+	    }
+	    
+	    ResourceItem closestResource = findClosestResource();
+	    if (closestResource != null && closestResource.isReadyToCollect()) {
+	        currentState = State.COLLECTING_RESOURCE; // prioritise resource collection
+	        return;
+	    } 
+	    
+	    // If no resource, look for the nearest rock
+        targetRock = findClosestRock();
+	    if (targetRock != null) {
+	          currentState = State.TARGETING_ROCK; // target rock if no resource
+	          return;
+	    } 
+	    
+	    // If no tasks are available, go idle
+	    currentState = State.DEFAULT_BEHAVIOR; // stay idle if no task available
+	}
+	
 	
 	/** Method findClosestRock - This finds the nearest rock in the arena 
 	 * 
@@ -94,6 +204,34 @@ public class MinerRobot extends Robot implements Serializable {
 		}
 		
 		return closestRock; // return the closest rock, or null if none found
+	}
+	
+	
+	/** Method findClosestResource - This finds the nearest rock resource in the arena 
+	 * 
+	 * @return The closest rock resource, or null if none exists
+	 */
+	private ResourceItem findClosestResource() {
+	    ResourceItem closestResource = null;
+	    double closestDistance = Double.MAX_VALUE;
+
+	    // Iterate through all items in the arena
+	    for (ArenaItem item : arena.getItems()) {
+	        if (item instanceof RockResource) { // Only consider rock resource
+	            ResourceItem resource = (ResourceItem) item;
+	            double dx = resource.getXPosition() - getXPosition();
+	            double dy = resource.getYPosition() - getYPosition();
+	            double distance = Math.sqrt(dx * dx + dy * dy);
+
+	            // Check if this resource is closer
+	            if (distance < closestDistance) {
+	                closestDistance = distance;
+	                closestResource = resource;
+	            }
+	        }
+	    }
+
+	    return closestResource; // Return the closest resource, or null if none exist
 	}
 	
 	/** Method draw - This draws the MinerRobot on the canvas

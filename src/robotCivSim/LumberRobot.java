@@ -69,6 +69,7 @@ public class LumberRobot extends Robot implements Serializable {
 
 	        case DEFAULT_BEHAVIOR:
 	            super.update(); // use BasicRobot's default update behaviour
+	            findNextTask(currentTime);
 	            break;    
 	            
 	        case IDLE:
@@ -177,7 +178,6 @@ public class LumberRobot extends Robot implements Serializable {
 	    currentState = State.DEFAULT_BEHAVIOR; // stay idle if no task available
 	}
 	
-
 	
 	/** Method findClosestTree - This finds the nearest tree in the arena 
 	 * 
@@ -206,6 +206,7 @@ public class LumberRobot extends Robot implements Serializable {
 		return closestTree; // return the closest tree, or null if none found
 	}
 	
+	
 	/** Method findClosestResource - This finds the nearest wood resource in the arena 
 	 * 
 	 * @return The closest wood resource, or null if none exists
@@ -216,7 +217,7 @@ public class LumberRobot extends Robot implements Serializable {
 
 	    // Iterate through all items in the arena
 	    for (ArenaItem item : arena.getItems()) {
-	        if (item instanceof ResourceItem) { // Only consider resources
+	        if (item instanceof WoodResource) { // Only consider wood resource
 	            ResourceItem resource = (ResourceItem) item;
 	            double dx = resource.getXPosition() - getXPosition();
 	            double dy = resource.getYPosition() - getYPosition();

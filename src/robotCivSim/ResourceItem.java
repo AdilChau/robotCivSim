@@ -48,7 +48,7 @@ public abstract class ResourceItem extends ArenaItem {
 	}
 	
 	/**
-	 * Method Draw to draw the resource item
+	 * Method Draw - to draw the resource item
 	 * 
 	 * @param canvas - MyCanvas object used for rendering
 	 */
