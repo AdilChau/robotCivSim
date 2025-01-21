@@ -32,19 +32,14 @@ public abstract class ResourceItem extends ArenaItem {
 	 */
 	@Override
 	public void update() {
-		// Handle bobbing animation
-		if (movingUp) {
-			bobbingOffset -= BOBBING_SPEED;
-			if (bobbingOffset <= 5) { // move up to a limit
-				movingUp = false;
-			}
-		} else {
-			bobbingOffset += BOBBING_SPEED;
-			if (bobbingOffset >= 5) { // move down to a limit
-				movingUp = true;
-			}
-		}
-		setYPosition(originalY + bobbingOffset); // update y-coordinate with bobbing effect 
+	    // Increment the offset to create a smooth loop
+	    bobbingOffset += BOBBING_SPEED;
+
+	    // Use sine function for a smooth looping animation within a set range
+	    double loopedOffset = Math.sin(bobbingOffset) * 5; // 5 is the amplitude of the bobbing motion
+
+	    // Update the y-coordinate based on the original position and looping offset
+	    setYPosition(originalY + loopedOffset);
 	}
 	
 	/**
