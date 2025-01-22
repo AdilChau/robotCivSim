@@ -82,15 +82,11 @@ public class LumberRobot extends Robot implements Serializable {
 
 	    // Handle collisions
 	    for (ArenaItem item : arena.getItems()) {
-	        if (item == targetTree || item instanceof ResourceItem) continue; // Skip targetTree or ResourceItem as LumberRobot has unique interactions
+	        if (item instanceof ResourceItem || item instanceof Obstacle) continue; // Skip tree and resources
 	        if (item != this && checkCollision(item)) {
 	            dx = -dx;
 	            dy = -dy;
-	            
-	            // Apply a small adjustment to prevent overlap
-	            setXPosition(getXPosition() + dx * 2);
-	            setYPosition(getYPosition() + dy * 2);
-	            break;                  
+	            break;                
 	        }
 	    }
 	}

@@ -8,7 +8,7 @@ import javafx.scene.image.Image;
 public class RockResource extends ResourceItem {
 
     /**
-     * Constructor for WoodResource
+     * Constructor for RockResource
      * 
      * @param x - x-coordinate of the wood resource
      * @param y - y-coordinate of the wood resource
