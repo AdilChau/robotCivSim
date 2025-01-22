@@ -5,10 +5,6 @@ import javafx.scene.image.Image;
 import java.io.IOException; // for file save and load
 import java.io.ObjectInputStream; // for file save and load
 import java.io.Serializable; // for file save and load
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.PriorityQueue;
 
 
 /** LumberRobot - A robot that targets trees and removes them on collision.
@@ -117,6 +113,13 @@ public class LumberRobot extends Robot implements Serializable {
 	    if (distanceToResource < getRadius() + resourceToCollect.getRadius()) {
 	    	arena.scheduleRemoval(resourceToCollect); // schedule removal
 	        resourceToCollect.destroy(); // collect the resource 
+	        
+	        SimulationGUI gui = getArena().getSimulationGUI();
+	        if (gui != null) {
+	            gui.incrementWoodResource(); // Increment wood counter in GUI
+	        }
+	        
+	        lastActionTime = currentTime; // set cooldown
 	        currentState = State.IDLE; // return to idle after collecting 
 	    } else {
 	        double angleToResource = Math.atan2(dyToResource, dxToResource);
@@ -175,7 +178,7 @@ public class LumberRobot extends Robot implements Serializable {
 	 */
 	private void chopTree() {
 	    if (targetTree instanceof Obstacle && "tree".equals(((Obstacle) targetTree).getType())) {
-	        targetTree.destroy(); // Chop the tree, triggering its destruction
+	        targetTree.destroy(); // Mine the rock, triggering its destruction
 	        targetTree = null; // Clear the current target
 	        currentState = State.IDLE; // Revert to idle state
 	    }
@@ -205,24 +208,24 @@ public class LumberRobot extends Robot implements Serializable {
 	private void findNextTask(long currentTime) {
 	    // Wait during cooldown
 	    if (currentTime - lastActionTime < 1000) {
-	    	return;
+	        return;
 	    }
-	    
+
 	    ResourceItem closestResource = findClosestResource();
 	    if (closestResource != null && closestResource.isReadyToCollect()) {
-	        currentState = State.COLLECTING_RESOURCE; // prioritise resource collection
+	        currentState = State.COLLECTING_RESOURCE; // Prioritize resource collection
 	        return;
-	    } 
-	    
+	    }
+
 	    // If no resource, look for the nearest tree
-        targetTree = findClosestTree();
+	    targetTree = findClosestTree();
 	    if (targetTree != null) {
-	          currentState = State.TARGETING_TREE; // target tree if no resource
-	          return;
-	    } 
-	    
+	        currentState = State.TARGETING_TREE; // Target tree if no resource
+	        return;
+	    }
+
 	    // If no tasks are available, go idle
-	    currentState = State.DEFAULT_BEHAVIOR; // stay idle if no task available
+	    currentState = State.DEFAULT_BEHAVIOR; // Stay idle if no task available
 	}
 	
 	

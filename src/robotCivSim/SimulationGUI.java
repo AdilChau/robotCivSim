@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar; // import toolbar
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -28,6 +29,8 @@ import javafx.animation.Animation; // for item popup
 import javafx.animation.AnimationTimer; // for item popup
 import javafx.animation.KeyFrame; // for item popup
 import javafx.animation.Timeline; // for item popup
+import javafx.scene.image.Image; // For loading and displaying images
+
 
 /** SimulationGUI - Is the Main GUI class for the robot simulation.
  * It extends JavaFX Application to create and manage the GUI.
@@ -42,6 +45,10 @@ public class SimulationGUI extends Application {
 	private double speedMultiplier = 1.0; // multiplier for animation speed
 	private ArenaItem draggedItem = null; // currently dragged item
 	private boolean isDragging = false; // flag to track if an item is being dragged
+    private int woodResourceCount = 0; // counter for wood resources
+    private int rockResourceCount = 0; // counter for rock resources
+    private Label woodResourceLabel; // label to display wood resource count
+    private Label rockResourceLabel; // label to display rock resource count
 	
 	/** Method Start - This sets up Menu stage and allows the user to proceed to the simulation
 	 * 
@@ -65,10 +72,10 @@ public class SimulationGUI extends Application {
 	    double stageY = stage.getY();
 	    double stageWidth = stage.getWidth();
 	    double stageHeight = stage.getHeight();
-	    System.out.println("Window maximized: " + isMaximized);
 	    
 		arena = new RobotArena(800, 600); // Initialise the arena
-	
+		arena.setSimulationGUI(this);
+		
 		// Add items for default arena
 		arena.addItem(new Obstacle(200, 200, 30, "tree")); // add an obstacle
 		arena.addItem(new Robot(400, 300, 20, arena)); // add a robot
@@ -83,14 +90,23 @@ public class SimulationGUI extends Application {
 		
 		root.setCenter(drawCanvas); // add the canvas to the centre of the layout
 		
+        // Create resource display
+        HBox resourceDisplay = createResourceDisplay();
+
+        // Add resource display and canvas to the container
+        VBox arenaContainer = new VBox();
+        arenaContainer.getChildren().addAll(resourceDisplay, drawCanvas);
+        arenaContainer.setStyle("-fx-alignment: center;");
+        root.setCenter(arenaContainer);
+		
 		// Combine both the menu bar and toolbar into a VBox to avoid clashing
 		MenuBar menuBar = createMenuBar(); // create the menu bar
 		ToolBar toolBar = createToolBar(); // create the toolbar
 		javafx.scene.layout.VBox topContainer = new javafx.scene.layout.VBox(menuBar, toolBar);
 		
 		root.setTop(topContainer); // add the toolbar to top of the canvas
+			
 		
-
 	    // Dynamically size the scene based on the current stage dimensions
 	    Scene scene = new Scene(root, stageWidth, stageHeight);
 		
@@ -136,6 +152,7 @@ public class SimulationGUI extends Application {
 		drawCanvas.setOnMousePressed(this::handleMousePressed); // handle clicks
 		drawCanvas.setOnMouseDragged(this::handleMouseDragged); // handle dragging
 		drawCanvas.setOnMouseReleased(this::handleMouseReleased); // handle release
+		
 		
 		timer.start();
 		addCanvasClickHandler(drawCanvas); // allows for items to be selected
@@ -324,7 +341,7 @@ public class SimulationGUI extends Application {
 		
 		// Layout for the buttons
 		VBox layout = new VBox(10, treeButton, rockButton); // vertical box layout with spacing 
-		layout.setAlignment(Pos.CENTER); // center align the buttons
+		layout.setAlignment(Pos.CENTER); // centre align the buttons
 		Scene scene = new Scene(layout, 200, 150); // create the scene with specified size
 		dialog.setScene(scene);
 		dialog.showAndWait(); // show the dialog and wait for the user interaction
@@ -384,6 +401,57 @@ public class SimulationGUI extends Application {
 		aboutStage.setScene(scene);
 		aboutStage.showAndWait(); // show the dialog and wait for user interaction 
 	}
+	
+	/** Method createResourceDisplay - Creates a display for resource counters to show wood and rock resources
+	 * Positioned above the arena  
+	 * 
+	 * @return HBox - the container for the resource counters
+	 */
+	private HBox createResourceDisplay() {
+		HBox resourceDisplay = new HBox(30); // spacing of 30 px
+		resourceDisplay.setStyle("-fx-padding: 10px; -fx-alignment: center;"); // set style 
+		
+		// Wood resource display
+		ImageView woodIcon = new ImageView(new Image(getClass().getResource("/robotCivSim/Assets/wood.png").toExternalForm()));
+		woodIcon.setFitWidth(30); // adjust width of icon
+		woodIcon.setFitHeight(30); // adjust height of the icon
+		woodResourceLabel = new Label("0"); //default to 0
+		woodResourceLabel.setStyle("-fx-font-size: 18px;"); // style the label
+		
+		HBox woodContainer = new HBox(5, woodIcon, woodResourceLabel); // icon and count
+		woodContainer.setStyle("-fx-alignment: center;"); // centre the wood container
+
+        // Rock resource display
+        ImageView rockIcon = new ImageView(new Image(getClass().getResource("/robotCivSim/Assets/rock.png").toExternalForm()));
+        rockIcon.setFitWidth(30);
+        rockIcon.setFitHeight(30);
+        rockResourceLabel = new Label("0");
+        rockResourceLabel.setStyle("-fx-font-size: 18px;");
+
+        HBox rockContainer = new HBox(5, rockIcon, rockResourceLabel);
+        rockContainer.setStyle("-fx-alignment: center;");
+
+        resourceDisplay.getChildren().addAll(woodContainer, rockContainer);
+
+        return resourceDisplay;
+    }
+	
+    /**
+     * Increments the wood resource counter and updates the GUI.
+     */
+    public void incrementWoodResource() {
+        woodResourceCount++;
+        woodResourceLabel.setText(String.valueOf(woodResourceCount));
+    }
+
+    /**
+     * Increments the rock resource counter and updates the GUI.
+     */
+    public void incrementRockResource() {
+        rockResourceCount++;
+        rockResourceLabel.setText(String.valueOf(rockResourceCount));
+    }
+
 	
 	/** Method resetCanvas - This resets the canvas and arena to a blank state
 	 * Removes all entities from the arena and clears the canvas

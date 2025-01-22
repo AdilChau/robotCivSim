@@ -39,4 +39,25 @@ public class WoodResource extends ResourceItem {
             getArena().scheduleRemoval(this);
         }
     }
+    
+	/**
+	 * Method Draw - to draw the resource item
+	 * 
+	 * @param canvas - MyCanvas object used for rendering
+	 */
+    @Override
+    public void draw(MyCanvas canvas) {
+        Image resourceImage = getResourceImage();
+        if (resourceImage != null) {
+            double scaleFactor = 0.7; // specific scale for WoodResource
+            double scaledWidth = getRadius() * 2 * scaleFactor;
+            double scaledHeight = getRadius() * 2 * scaleFactor;
+
+            canvas.drawImage(resourceImage,
+                    getXPosition() - scaledWidth / 2,
+                    getYPosition() - scaledHeight / 2,
+                    scaledWidth,
+                    scaledHeight);
+        }
+    }
 }

@@ -22,6 +22,9 @@ public class RobotArena implements Serializable {
 	private ArrayList<ArenaItem> items; // make an ArrayList of ArenaItems
 	private transient HashSet<ArenaItem> itemsToRemove; // transient to avoid serialisation
 	private transient List<ArenaItem> itemsToAdd = new ArrayList<>(); // list of items to add
+	private transient SimulationGUI simulationGUI;
+
+
 	
 	/** Constructor for RobotArena 
 	 * Initialises the arena with specified dimensions and an empty list of items
@@ -214,7 +217,20 @@ public class RobotArena implements Serializable {
 	public void removeItem(ArenaItem item) {
 	    items.remove(item); // remove the item from the list
 	}
-
+	
+	/** Setter for simulationGUI
+	 * 
+	 */
+	public void setSimulationGUI(SimulationGUI simulationGUI) {
+	    this.simulationGUI = simulationGUI;
+	}
+	
+	/** Getter for simulationGUI
+	 * 
+	 */
+	public SimulationGUI getSimulationGUI() {
+	    return simulationGUI;
+	}
 
 }
 

@@ -109,6 +109,10 @@ public class MinerRobot extends Robot implements Serializable {
 	    if (distanceToResource < getRadius() + resourceToCollect.getRadius()) {
 	    	arena.scheduleRemoval(resourceToCollect); // schedule removal
 	        resourceToCollect.destroy(); // collect the resource 
+	        SimulationGUI gui = getArena().getSimulationGUI();
+	        if (gui != null) {
+	            gui.incrementRockResource(); // Increment rock counter in GUI
+	        }
 	        lastActionTime = currentTime; // set cooldown
 	        currentState = State.IDLE; // return to idle after collecting 
 	    } else {
