@@ -5,16 +5,23 @@ import javafx.scene.image.Image;
 import java.io.IOException; // for file save and load
 import java.io.ObjectInputStream; // for file save and load
 import java.io.Serializable; // for file save and load
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
 
 
 /** LumberRobot - A robot that targets trees and removes them on collision.
  * Inherits from the robot class and overrides specific behaviours to handle trees.
+ * Uses A* pathfinding algorithm to navigate the arena and avoid obstacles
  */
 public class LumberRobot extends Robot implements Serializable {
 	private static final long serialVersionUID = 1L; // serialisation ID
 	private Obstacle targetTree; // the current tree target
 	private transient Image[] frames; // animation frames for the LumberRobot (transient for serialisation)
-	private long lastActionTime = 0; // tracks the last time a resource was collected or atree was destroyed
+	private long lastActionTime = 0; 
+	private ArenaItem rememberedObstacle; // tracks the current obstacle
+	private long obstacleAvoidanceEndTime = 0; // tracks when to stop avoiding the obstacle
 	
 	/** 
 	 * Enum state for prioritising tasks
@@ -79,18 +86,22 @@ public class LumberRobot extends Robot implements Serializable {
 
 	    // Handle collisions
 	    for (ArenaItem item : arena.getItems()) {
-	        if (item instanceof ResourceItem || item instanceof Obstacle) continue; // Skip trees and resources
+	        if (item == targetTree || item instanceof ResourceItem) continue; // Skip targetTree or ResourceItem as LumberRobot has unique interactions
 	        if (item != this && checkCollision(item)) {
 	            dx = -dx;
 	            dy = -dy;
-	            break;
+	            
+	            // Apply a small adjustment to prevent overlap
+	            setXPosition(getXPosition() + dx * 2);
+	            setYPosition(getYPosition() + dy * 2);
+	            break;                  
 	        }
 	    }
 	}
 
 	/** Method handleCollectingResource - This is for the collecting resources 
 	 * 
-	 * @param currentTime 
+	 * @param currentTime - The current system time in milliseconds
 	 */
 	private void handleCollectingResource(long currentTime) {
 	    ResourceItem resourceToCollect = findClosestResource();
@@ -106,7 +117,6 @@ public class LumberRobot extends Robot implements Serializable {
 	    if (distanceToResource < getRadius() + resourceToCollect.getRadius()) {
 	    	arena.scheduleRemoval(resourceToCollect); // schedule removal
 	        resourceToCollect.destroy(); // collect the resource 
-	        lastActionTime = currentTime; // set cooldown
 	        currentState = State.IDLE; // return to idle after collecting 
 	    } else {
 	        double angleToResource = Math.atan2(dyToResource, dxToResource);
@@ -118,39 +128,76 @@ public class LumberRobot extends Robot implements Serializable {
 	    }
 	}
 	
-	/** Method handleTargetingTree - This is for targeting trees
+	/** Method handleTargetingTree - Guides the LumberRobot towards the target tree.
+	 * Includes simple obstacle avoidance behaviour by adjusting direction dynamically.
+	 * If the robot reaches the tree, it chops it and collects the dropped resource.
+	 * If the path is blocked, the robot attempts to steer around obstacles.
 	 * 
-	 * @param currentTime 
+	 * @param currentTime - The current system time in milliseconds
 	 */
 	private void handleTargetingTree(long currentTime) {
-	    if (targetTree == null || !arena.getItems().contains(targetTree)) {
-	        targetTree = findClosestTree();
-	    }
-
-	    if (targetTree == null) {
-	        currentState = State.IDLE; // no tree to target
+	    if (targetTree == null || targetTree.getArena() == null) {
+	        currentState = State.IDLE;
 	        return;
 	    }
 
-	    double dxToTarget = targetTree.getXPosition() - getXPosition();
-	    double dyToTarget = targetTree.getYPosition() - getYPosition();
-	    double distanceToTarget = Math.sqrt(dxToTarget * dxToTarget + dyToTarget * dyToTarget);
+	    double dxToTree = targetTree.getXPosition() - getXPosition();
+	    double dyToTree = targetTree.getYPosition() - getYPosition();
+	    double distanceToTree = Math.sqrt(dxToTree * dxToTree + dyToTree * dyToTree);
 
-	    if (distanceToTarget < getRadius() + targetTree.getRadius()) {
-	        targetTree.destroy(); // chop tree and drop resource
-	        lastActionTime = currentTime; // set cooldown
-	        targetTree = null;
-	        currentState = State.IDLE; // return to idle after chopping
+	    if (distanceToTree < getRadius() + targetTree.getRadius()) {
+	        chopTree();
+	        return;
+	    }
+
+	    if (rememberedObstacle != null && currentTime < obstacleAvoidanceEndTime) {
+	        avoidObstacle(rememberedObstacle);
 	    } else {
-	        double angleToTarget = Math.atan2(dyToTarget, dxToTarget);
-	        dx = Math.cos(angleToTarget) * speed;
-	        dy = Math.sin(angleToTarget) * speed;
+	        double angleToTree = Math.atan2(dyToTree, dxToTree);
+	        dx = Math.cos(angleToTree) * speed;
+	        dy = Math.sin(angleToTree) * speed;
+
+	        for (ArenaItem item : arena.getItems()) {
+	            if (item != this && item != targetTree && checkCollision(item)) {
+	                rememberedObstacle = item;
+	                obstacleAvoidanceEndTime = currentTime + 2000; // Avoid obstacle for 2 seconds
+	                avoidObstacle(item);
+	                return;
+	            }
+	        }
 
 	        setXPosition(getXPosition() + dx);
 	        setYPosition(getYPosition() + dy);
 	    }
 	}
 
+	/** Method chopTree - Chops the target tree and schedules the dropped resource for addition to the arena.
+	 */
+	private void chopTree() {
+	    if (targetTree instanceof Obstacle && "tree".equals(((Obstacle) targetTree).getType())) {
+	        targetTree.destroy(); // Chop the tree, triggering its destruction
+	        targetTree = null; // Clear the current target
+	        currentState = State.IDLE; // Revert to idle state
+	    }
+	}
+
+	/** Method avoidObstacle - Adjusts the robot's direction to avoid a blocking obstacle.
+	 * 
+	 * @param obstacle - The obstacle to avoid
+	 */
+	private void avoidObstacle(ArenaItem obstacle) {
+	    double angleToObstacle = Math.atan2(obstacle.getYPosition() - getYPosition(),
+	                                        obstacle.getXPosition() - getXPosition());
+	    double avoidanceAngle = angleToObstacle + Math.PI / 2; // Perpendicular direction
+	    dx = Math.cos(avoidanceAngle) * speed;
+	    dy = Math.sin(avoidanceAngle) * speed;
+
+	    setXPosition(getXPosition() + dx);
+	    setYPosition(getYPosition() + dy);
+	}
+	
+
+	
 	/** Method findNextTask - This is for finding the next task
 	 * 
 	 * @param currentTime 
@@ -233,7 +280,6 @@ public class LumberRobot extends Robot implements Serializable {
 
 	    return closestResource; // Return the closest resource, or null if none exist
 	}
-
 	
 	/** Method draw - This draws the LumberRobot on the canvas
 	 * It displays its unique animation frames.
@@ -258,8 +304,8 @@ public class LumberRobot extends Robot implements Serializable {
         }
         canvas.drawImage(
                 frames[currentFrameIndex],
-                -getRadius() * 1.5, // centering the image horizontally
-                -getRadius() * 1.5, // centering the image vertically
+                -getRadius() * 1.5, // centring the image horizontally
+                -getRadius() * 1.5, // centring the image vertically
                 getRadius() * 3, // scaled width
                 getRadius() * 3 // scaled height
         );
@@ -298,7 +344,7 @@ public class LumberRobot extends Robot implements Serializable {
 	 * It also restores the transient fields like the frames array
 	 */
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-	    ois.defaultReadObject(); // deserialize non-transient fields
+	    ois.defaultReadObject(); // deserialise non-transient fields
 	    
 	    // Reinitialise the transient frames array
 	    frames = new Image[] {

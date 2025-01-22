@@ -21,7 +21,9 @@ public class Robot extends ArenaItem {
 	public int currentFrameIndex; // index to track the current frame
 	public long lastFrameTime; // time when the last frame was updated
 	public static final long FRAME_DURATION = 200_000_000; // duration of each frame in nanoseconds
-	
+	private long lastCollisionTime = 0;
+	private static final long COLLISION_COOLDOWN = 200; // 200ms cooldown
+	private ArenaItem lastCollidedItem;
 	
 	
 	/** Constructor for Robot
@@ -59,50 +61,61 @@ public class Robot extends ArenaItem {
 	 */
 	@Override
 	public void update() {
-		long currentTime = System.nanoTime(); // current time in nanoseconds
-		// Update the animation frame based on how much time has elapsed
-		if (currentTime - lastFrameTime >= FRAME_DURATION) {
-			currentFrameIndex = (currentFrameIndex + 1) % frames.length; // loop through the three frames
-			lastFrameTime = currentTime; // reset the frame time
-		}
-		
-		// Update the position
-		double newX = getXPosition() + dx; // new x-coordinate
-		double newY = getYPosition() + dy; // new y-coordinate
-		
-		// Check for collisions with other items in the arena
-		for (ArenaItem item : arena.getItems()) {
-			// If a collision is detected, reverse the direction of the robot
-			if (item != this && checkCollision(item)) {
-				// Apply small random offset to avoid repetitive collisions
-		        double angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * Math.PI / 4; // add a small random angle
-		        dx = Math.cos(angle) * speed; // update dx with adjusted direction
-		        dy = Math.sin(angle) * speed; // update dy with adjusted direction
-				
-				// Move slightly to prevent getting stuck in a collision
-				newX += dx * 2; // adjust x-position
-				newY += dy * 2; // adjust y-position
-		        System.out.println(getName() + " collided with " + item.getName() + " and adjusted direction to (" + dx + ", " + dy + ")");
-				break; // only handle one collision at a time
-			}
-		}
-		
-		// Logic to "bounce" of walls
-		if (newX < getRadius() || newX > arena.getWidth() - getRadius()) { // reverse the x-direction if either condition is met
-			dx = -dx; // reverse the x-direction on hitting the left or right boundary
-			dy += (Math.random() - 0.5) * 0.1; // add a small random offset to dy
-			newX = Math.max(getRadius(), Math.min(newX, arena.getWidth() - getRadius()));
-		}
-		
-		if (newY < getRadius() || newY > arena.getHeight() - getRadius()) { // reverse the y-direction if either condition is met
-			dy = -dy; // reverse the y-direction on hitting a top or bottom boundary
-			dx += (Math.random() - 0.5) * 0.1; // add a small random offset to dx
-			newY = Math.max(getRadius(), Math.min(newY, arena.getHeight() - getRadius()));
-		}
-		
-		// Set the new position 
-		setPosition(newX, newY, arena.getWidth(), arena.getHeight());
+	    long currentTime = System.nanoTime(); // current time in nanoseconds
+
+	    // Update the animation frame
+	    if (currentTime - lastFrameTime >= FRAME_DURATION) {
+	        currentFrameIndex = (currentFrameIndex + 1) % frames.length; // loop through frames
+	        lastFrameTime = currentTime; // reset frame time
+	    }
+
+	    // Predict the new position
+	    double newX = getXPosition() + dx;
+	    double newY = getYPosition() + dy;
+
+	    boolean collisionOccurred = false;
+
+	    // Check for collisions with other items in the arena
+	    for (ArenaItem item : arena.getItems()) {
+	        if (item != this && checkCollision(item)) {
+	            // Check if sufficient time has passed since the last collision
+	            if (System.currentTimeMillis() - lastCollisionTime > COLLISION_COOLDOWN) {
+	                collisionOccurred = true;
+
+	                // reverse direction
+	                dx = -dx;
+	                dy = -dy;
+
+	                // Move slightly back to prevent overlapping
+	                newX = getXPosition() + dx * 2;
+	                newY = getYPosition() + dy * 2;
+
+	                // Update the last collision time
+	                lastCollisionTime = System.currentTimeMillis();
+
+	                System.out.println(getName() + " collided with " + item.getName() + " and reversed direction.");
+	                break; // handle one collision at a time
+	            }
+	        }
+	    }
+
+	    // Boundary logic to prevent leaving the arena
+	    if (newX < getRadius() || newX > arena.getWidth() - getRadius()) {
+	        dx = -dx; // reverse the x-direction
+	        newX = Math.max(getRadius(), Math.min(newX, arena.getWidth() - getRadius()));
+	    }
+	    if (newY < getRadius() || newY > arena.getHeight() - getRadius()) {
+	        dy = -dy; // reverse the y-direction
+	        newY = Math.max(getRadius(), Math.min(newY, arena.getHeight() - getRadius()));
+	    }
+
+	    // If no collision, apply the new position
+	    if (!collisionOccurred) {
+	        setPosition(newX, newY, arena.getWidth(), arena.getHeight());
+	    }
 	}
+
+
 	
 	
 	/** Method draw - This is to draw the robot
@@ -152,25 +165,29 @@ public class Robot extends ArenaItem {
 			super.setPosition(x, y, arenaWidth, arenaHeight); // Delegate to base class (ArenaItem)
 	}
 	
-	/** Method checkCollision - This checks if this robot is colliding with another item
-	 * Uses the Euclidean distance formula to detect if two items are overlapping
+	/** Method checkCollision - Checks if this robot is colliding with another item.
+	 * Uses the Euclidean distance formula to detect if two items are overlapping.
+	 * Adds logic to track recent collisions and prevent immediate re-collision.
 	 * 
 	 * @param item - The other ArenaItem to check collision with
-	 * @return true if a collision is detected, otherwise return false
+	 * @return true if a collision is detected, otherwise false
 	 */
 	protected boolean checkCollision(ArenaItem item) {
-		// Calculate the distance between the current robot and other item
-		double dx = getXPosition() - item.getXPosition(); // difference in x-coordinates
-		double dy = getYPosition() - item.getYPosition(); // difference in y-coordinates
-		double distance = Math.sqrt(dx * dx + dy * dy); // compute Euclidean distance
-		double collisionBuffer = 0.1 * getRadius(); // add a small buffer
-		
-		boolean collision = distance < (getRadius() + item.getRadius() - collisionBuffer); 
-		if (collision) {
-			System.out.println(getName() + " collided with " + item.getName() + " at (" + getXPosition() + ", " + getYPosition() + ")");
-		}
-		return collision;
+	    double dx = getXPosition() - item.getXPosition();
+	    double dy = getYPosition() - item.getYPosition();
+	    double distance = Math.sqrt(dx * dx + dy * dy);
+
+	    double collisionThreshold = getRadius() + item.getRadius();
+	    boolean collision = distance <= collisionThreshold;
+
+	    if (collision && (item != lastCollidedItem || System.currentTimeMillis() - lastCollisionTime > COLLISION_COOLDOWN)) {
+	        lastCollidedItem = item;
+	        lastCollisionTime = System.currentTimeMillis();
+	        return true;
+	    }
+	    return false;
 	}
+
 	
 	/**
 	 * This default method is so that the Lumber and Miner robots can have destroy functionality

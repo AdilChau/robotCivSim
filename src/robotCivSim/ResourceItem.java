@@ -53,8 +53,8 @@ public abstract class ResourceItem extends ArenaItem {
 	    Image resourceImage = getResourceImage();
 	    if (resourceImage != null) {
 	        canvas.drawImage(resourceImage, 
-	            getXPosition() - getRadius(), // X position adjusted for center
-	            getYPosition() - getRadius(), // Y position adjusted for center
+	            getXPosition() - getRadius(), // X position adjusted for centre
+	            getYPosition() - getRadius(), // Y position adjusted for centre
 	            getRadius() * 2, // Width of the resource item
 	            getRadius() * 2  // Height of the resource item
 	        );

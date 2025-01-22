@@ -257,8 +257,8 @@ public class MinerRobot extends Robot implements Serializable {
         }
         canvas.drawImage(
                 frames[currentFrameIndex],
-                -getRadius() * 1.5, // centering the image horizontally
-                -getRadius() * 1.5, // centering the image vertically
+                -getRadius() * 1.5, // centring the image horizontally
+                -getRadius() * 1.5, // centring the image vertically
                 getRadius() * 3, // scaled width
                 getRadius() * 3 // scaled height
         );
