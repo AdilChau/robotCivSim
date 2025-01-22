@@ -1,6 +1,7 @@
 package robotCivSim;
 
 import javafx.scene.image.Image;
+
 import java.io.IOException; // for file save and load
 import java.io.ObjectInputStream; // for file save and load
 import java.io.Serializable; // for file save and load
@@ -15,6 +16,8 @@ public class MinerRobot extends Robot implements Serializable {
 	private Obstacle targetRock; // the current rock target
 	private transient Image[] frames; // animation frames for the MienrRobot (transient for serialisation)
 	private long lastActionTime = 0;
+	private ArenaItem rememberedObstacle; // tracks the current obstacle
+	private long obstacleAvoidanceEndTime = 0; // tracks when to stop avoiding the obstacle	
 	
 	/** 
 	 * Enum state for prioritising tasks
@@ -118,37 +121,72 @@ public class MinerRobot extends Robot implements Serializable {
 	    }
 	}
 		
-	/** Method handleTargetingRock - This is for targeting rocks
+	/** Method handleTargetingRock - Guides the MinerRobot towards the target rock
+	 * Includes simple obstacle avoidance behaviour by adjusting direction dynamically
+	 * If the robot reaches the rock, it mines it and collects the dropped resource
+	 * If the path is blocked, the robot attempts to steer around obstacles
 	 * 
-	 * @param currentTime 
+	 * @param currentTime - The current system time in milliseconds
 	 */
 	private void handleTargetingRock(long currentTime) {
-	    if (targetRock == null || !arena.getItems().contains(targetRock)) {
-	        targetRock = findClosestRock();
-	    }
-
-	    if (targetRock == null) {
-	        currentState = State.DEFAULT_BEHAVIOR; // no rock to target
+	    if (targetRock == null || targetRock.getArena() == null) {
+	        currentState = State.IDLE;
 	        return;
 	    }
 
-	    double dxToTarget = targetRock.getXPosition() - getXPosition();
-	    double dyToTarget = targetRock.getYPosition() - getYPosition();
-	    double distanceToTarget = Math.sqrt(dxToTarget * dxToTarget + dyToTarget * dyToTarget);
+	    double dxToTree = targetRock.getXPosition() - getXPosition();
+	    double dyToTree = targetRock.getYPosition() - getYPosition();
+	    double distanceToTree = Math.sqrt(dxToTree * dxToTree + dyToTree * dyToTree);
 
-	    if (distanceToTarget < getRadius() + targetRock.getRadius()) {
-	        targetRock.destroy(); // mine rock and drop resource
-	        lastActionTime = currentTime; // set cooldown
-	        targetRock = null;
-	        currentState = State.IDLE; // return to idle after mining
+	    if (distanceToTree < getRadius() + targetRock.getRadius()) {
+	        mineRock();
+	        return;
+	    }
+
+	    if (rememberedObstacle != null && currentTime < obstacleAvoidanceEndTime) {
+	        avoidObstacle(rememberedObstacle);
 	    } else {
-	        double angleToTarget = Math.atan2(dyToTarget, dxToTarget);
-	        dx = Math.cos(angleToTarget) * speed;
-	        dy = Math.sin(angleToTarget) * speed;
+	        double angleToTree = Math.atan2(dyToTree, dxToTree);
+	        dx = Math.cos(angleToTree) * speed;
+	        dy = Math.sin(angleToTree) * speed;
+
+	        for (ArenaItem item : arena.getItems()) {
+	            if (item != this && item != targetRock && checkCollision(item)) {
+	                rememberedObstacle = item;
+	                obstacleAvoidanceEndTime = currentTime + 2000; // Avoid obstacle for 2 seconds
+	                avoidObstacle(item);
+	                return;
+	            }
+	        }
 
 	        setXPosition(getXPosition() + dx);
 	        setYPosition(getYPosition() + dy);
 	    }
+	}
+
+	/** Method mineRock - Mines the target rock and schedules the dropped resource for addition to the arena.
+	 */
+	private void mineRock() {
+	    if (targetRock instanceof Obstacle && "rock".equals(((Obstacle) targetRock).getType())) {
+	        targetRock.destroy(); // Mine the rock, triggering its destruction
+	        targetRock = null; // Clear the current target
+	        currentState = State.IDLE; // Revert to idle state
+	    }
+	}
+
+	/** Method avoidObstacle - Adjusts the robot's direction to avoid a blocking obstacle.
+	 * 
+	 * @param obstacle - The obstacle to avoid
+	 */
+	private void avoidObstacle(ArenaItem obstacle) {
+	    double angleToObstacle = Math.atan2(obstacle.getYPosition() - getYPosition(),
+	                                        obstacle.getXPosition() - getXPosition());
+	    double avoidanceAngle = angleToObstacle + Math.PI / 2; // Perpendicular direction
+	    dx = Math.cos(avoidanceAngle) * speed;
+	    dy = Math.sin(avoidanceAngle) * speed;
+
+	    setXPosition(getXPosition() + dx);
+	    setYPosition(getYPosition() + dy);
 	}
 	
 	/** Method findNextTask - This is for finding the next task
