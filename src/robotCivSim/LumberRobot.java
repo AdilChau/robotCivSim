@@ -18,6 +18,8 @@ public class LumberRobot extends Robot implements Serializable {
 	private long lastActionTime = 0; 
 	private ArenaItem rememberedObstacle; // tracks the current obstacle
 	private long obstacleAvoidanceEndTime = 0; // tracks when to stop avoiding the obstacle
+	private long lastCollisionTime = 0;
+	private static final long COLLISION_COOLDOWN = 200; // 200ms cooldown
 	
 	/** 
 	 * Enum state for prioritising tasks
@@ -81,15 +83,17 @@ public class LumberRobot extends Robot implements Serializable {
 	    }
 
 	    // Handle collisions
+	    boolean collisionOccurred = false;
 	    for (ArenaItem item : arena.getItems()) {
 	        if (item instanceof ResourceItem || item instanceof Obstacle) continue; // Skip tree and resources
-	        if (item != this && checkCollision(item)) {
-	            dx = -dx;
-	            dy = -dy;
-	            break;                
+	        if (item != this && checkCollision(item)) {		
+	        		// Reverse direction upon collision
+	 	            dx = -dx;
+		            dy = -dy;
+		            break;      
+	        	}          
 	        }
 	    }
-	}
 
 	/** Method handleCollectingResource - This is for the collecting resources 
 	 * 
@@ -98,7 +102,7 @@ public class LumberRobot extends Robot implements Serializable {
 	private void handleCollectingResource(long currentTime) {
 	    ResourceItem resourceToCollect = findClosestResource();
 	    if (resourceToCollect == null || !resourceToCollect.isReadyToCollect()) {
-	        currentState = State.IDLE; // go back to idle if no resource to collect
+	        currentState = State.DEFAULT_BEHAVIOR; // go back to idle if no resource to collect
 	        return;
 	    }
 	
@@ -116,7 +120,7 @@ public class LumberRobot extends Robot implements Serializable {
 	        }
 	        
 	        lastActionTime = currentTime; // set cooldown
-	        currentState = State.IDLE; // return to idle after collecting 
+	        currentState = State.DEFAULT_BEHAVIOR; // return to idle after collecting 
 	    } else {
 	        double angleToResource = Math.atan2(dyToResource, dxToResource);
 	        dx = Math.cos(angleToResource) * speed;
@@ -127,6 +131,7 @@ public class LumberRobot extends Robot implements Serializable {
 	    }
 	}
 	
+
 	/** Method handleTargetingTree - Guides the LumberRobot towards the target tree.
 	 * Includes simple obstacle avoidance behaviour by adjusting direction dynamically.
 	 * If the robot reaches the tree, it chops it and collects the dropped resource.
