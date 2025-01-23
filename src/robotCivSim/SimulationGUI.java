@@ -79,6 +79,7 @@ public class SimulationGUI extends Application {
 		// Add items for default arena
 		arena.addItem(new Obstacle(200, 200, 30, "tree")); // add an obstacle
 		arena.addItem(new Robot(400, 300, 20, arena)); // add a robot
+		arena.addItem(new PlayerRobot(100, 100, 20, arena)); // manually add robot to arena
 		
 		// Set up the GUI Layout
 		BorderPane root = new BorderPane(); // root layout for the GUI
@@ -87,6 +88,9 @@ public class SimulationGUI extends Application {
 		Canvas drawCanvas = new Canvas(800, 600); // size matches the RobotArena
 		GraphicsContext gc = drawCanvas.getGraphicsContext2D();
 		canvas = new MyCanvas(gc, 800, 600); // create the canvas
+		
+		drawCanvas.setFocusTraversable(true); // make canvas focusable
+		drawCanvas.requestFocus(); // ensure canvas receives focus initially
 		
 		root.setCenter(drawCanvas); // add the canvas to the centre of the layout
 		
@@ -110,6 +114,23 @@ public class SimulationGUI extends Application {
 	    // Dynamically size the scene based on the current stage dimensions
 	    Scene scene = new Scene(root, stageWidth, stageHeight);
 		
+	    //  Add key event handlers for the player robot
+	    scene.setOnKeyPressed(event -> {
+	    	for (ArenaItem item : arena.getItems()) {
+	    		if (item instanceof PlayerRobot) {
+	    			((PlayerRobot) item).handleKeyPress(event);
+	    		}
+	    	}
+	    });
+	    
+	    scene.setOnKeyReleased(event -> {
+	    	for (ArenaItem item : arena.getItems()) {
+	    		if (item instanceof PlayerRobot) {
+	    			((PlayerRobot) item).handleKeyRelease(event);
+	    		}
+	    	}
+	    });
+	    
 		// Set up the scene and stage
 	    Platform.runLater(() -> {
 			stage.setScene(scene);
@@ -242,10 +263,11 @@ public class SimulationGUI extends Application {
 	 */
 	private void addRobot(RobotType type) {
 		double x, y; // initialise x and y coordinates
+		Robot robot = null;
 		do {
 			x = 30 + Math.random() * (800 - 60); // random x-coordinate (ensures it fits within boundaries)
 			y = 30 + Math.random() * (600 - 60); // random y-coordiante	 (ensures it fits within boundaries)
-		} while (arena.checkOverlap(x, y, 20)); // check for overlap
+		} while (arena.checkOverlap(x, y, 20, robot)); // check for overlap
 		
 		
 		// Add the specified type of robot
@@ -265,6 +287,16 @@ public class SimulationGUI extends Application {
 		arena.drawArena(canvas);
 
 
+	}
+	
+	/** Method addPlayerRobot - This adds the Player's robot to the arena which it can control 
+	 * Has unique collision logic and functionality compared to all other robot types
+	 */
+	public void addPlayerRobot() {
+		double x = arena.getWidth() / 2; // x-coordinate
+		double y = arena.getHeight() / 2; // y-coordinate
+		arena.addItem(new PlayerRobot(x, y, 20, arena)); // manually add robot to arena
+		arena.drawArena(canvas); // draw on canvas
 	}
 	
 	/** Method showRobotMenu - This displays a popup menu to choose robot type 
@@ -355,10 +387,11 @@ public class SimulationGUI extends Application {
 	 */
 	private void addSpecificObstacle(String type) {
 		double x, y; // initialise x and y coordinates
+		ArenaItem obstacle = null;
 		do {
 			x = 30 + Math.random() * (800 - 60); // random x-coordiante (ensures it fits within boundaries)
 			y = 30 + Math.random() * (600 - 60); // random y-coordinate (ensures it fits within boundaries)
-		} while (arena.checkOverlap(x, y, 30)); // check for overlap with existing items
+		} while (arena.checkOverlap(x, y, 30, obstacle)); // check for overlap with existing items
 		
 		// Add the appropriate obstacle based on the type
 		if (type.equals("tree")) {
@@ -489,7 +522,7 @@ public class SimulationGUI extends Application {
 			double y = event.getY();
 			
 			// Update the item's position
-			if (!arena.checkOverlap(x, y, draggedItem.getRadius())) { // ensure no overlap
+			if (!arena.checkOverlap(x, y, ((ArenaItem) draggedItem).getRadius(), (ArenaItem) draggedItem)) { // ensure no overlap
 				draggedItem.setPosition(x, y, arena.getWidth(), arena.getHeight());
 				arena.drawArena(canvas); // redraw arena to reflect changes
 				isDragging = true; // set flag as dragging
@@ -585,8 +618,7 @@ public class SimulationGUI extends Application {
 				handleCanvasClick(e.getX(), e.getY()); // pass the clicked coordinates
 			}
 		});
-	}
-	
+	}	
 	
 	/** Method saveArenaToFile - This saves the current state of the arena to a file
 	 * Opens a file chooser dialog for the user to specify the save location

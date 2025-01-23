@@ -98,21 +98,22 @@ public class RobotArena implements Serializable {
 	 * @param radius - radius of the new item
 	 * @return true if an overlap is detected, otherwise re turn false
 	 */
-	public boolean checkOverlap(double x, double y, double radius) {
-		// Loop through all items in the arena to check for any overlap
-		for (ArenaItem item : items) {
-			// Calculate the distance between the given coordinates and the current item's position
-			double dx = x - item.getXPosition(); // difference in x-coordinate
-			double dy = y - item.getYPosition(); // difference in y-coordinate
-			double distance = Math.sqrt(dx * dx + dy * dy); // compute Euclidean distance
-			
-			// Check if the distance is less than the sum of the radii (this would indicate an overlap)
-			if (distance < (radius + item.getRadius())) {
-				return true; // overlap detected
-			}
-		}
-		return false; // no overlap detected
+	public boolean checkOverlap(double x, double y, double radius, ArenaItem self) {
+	    for (ArenaItem item : items) {
+	        if (item == self) {
+	            continue; // Skip self
+	        }
+	        double dx = x - item.getXPosition();
+	        double dy = y - item.getYPosition();
+	        double distance = Math.sqrt(dx * dx + dy * dy);
+
+	        if (distance < (radius + item.getRadius())) {
+	            return true; // Overlap detected
+	        }
+	    }
+	    return false; // No overlap
 	}
+
 	
 	/** Method clearArena - This clears all the items from the arena
 	 * Effectively removing all obstacles, robots, and other entities

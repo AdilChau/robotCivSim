@@ -80,7 +80,7 @@ public abstract class ResourceItem extends ArenaItem {
 	 * @return true if the resource can be collected, false otherwise
 	 */
 	public boolean isReadyToCollect() {
-		return System.currentTimeMillis() - spawnTime > 1; // almost 0 delay
+		return System.currentTimeMillis() - spawnTime > 1; // almost 0 delayI want you to help me with a project I have bee
 	}
 	
     /**
