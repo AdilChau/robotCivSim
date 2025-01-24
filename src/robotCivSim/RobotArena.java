@@ -88,7 +88,7 @@ public class RobotArena implements Serializable {
 	 */
 	public double getHeight() {
 		return height; // get height
-	}
+	} 
 	
 	/** Method checkOverlap - This checks if a given position overlaps with any existing item in the arena
 	 * Ensures that when adding new obstacles and robots they don't overlap with already existing ones
