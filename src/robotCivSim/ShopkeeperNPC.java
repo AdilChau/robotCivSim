@@ -23,7 +23,7 @@ public class ShopkeeperNPC extends NPC_Robot {
 	 * @param arena - reference to the RobotArena's instance
 	 */
 	public ShopkeeperNPC(double x, double y, double radius, RobotArena arena) {
-		super(x, y, radius, "file:src/robotCivSim/Assets/minerRobotFrame1.png", arena);
+		super(x, y, radius, "file:src/robotCivSim/Assets/shopkeeperNPCw.png", arena);
 	}
 	
 	/** Method interact - This defines the interaction behaviour when the player collied with the NPC
