@@ -18,6 +18,9 @@ public class PlayerRobot extends ArenaItem {
 	private static final long FRAME_DURATION = 200_000_000; // 200ms per frame
 	private RobotArena arena; // reference to RobotArena arena
 	private double rotationAngle = 0; // angle in degrees
+	private long lastInteractionTime = 0; // Track the last interaction time
+	private static final long INTERACTION_COOLDOWN = 2_000_000_000; // 5 seconds in nanoseconds
+
 
 
 	/**
@@ -60,8 +63,33 @@ public class PlayerRobot extends ArenaItem {
 	    double newX = getXPosition() + dx * speed;
 	    double newY = getYPosition() + dy * speed;
 
+	    boolean isInteractingWithNPC = false; // track if the currently interacting with NPC
+	    
+	    // Detect collision with NPCs
+	    for (ArenaItem item : arena.getItems()) {
+	        if (item instanceof ShopkeeperNPC) { // Handle Shopkeeper-specific interaction
+	            double dx = newX - item.getXPosition();
+	            double dy = newY - item.getYPosition();
+	            double distance = Math.sqrt(dx * dx + dy * dy);
 
-	    if (!arena.checkOverlap(newX, newY, getRadius(), this)) { // Pass `this` to exclude self
+	            if (distance < (getRadius() + item.getRadius())) {
+	            	long currentTime = System.nanoTime();
+	            	if (currentTime - lastInteractionTime >= INTERACTION_COOLDOWN) {
+		                // Trigger the NPC interaction
+		                ((ShopkeeperNPC) item).interact(this, arena.getSimulationGUI().getCanvas());
+		                lastInteractionTime = currentTime; // Update the last interaction time
+	            	}
+	                isInteractingWithNPC = true;
+	                break;
+	            } else {
+	                // Reset the interaction state if no collision
+	                ((NPC_Robot) item).setInteracting(false);
+	            }
+	        }
+	    }
+	    
+	    if (!isInteractingWithNPC && !arena.checkOverlap(newX, newY, getRadius(), this)) {
+	        // Pass `this` to exclude self and move the player
 	        setPosition(newX, newY, arena.getWidth(), arena.getHeight());
 	    }
 	    
@@ -86,7 +114,7 @@ public class PlayerRobot extends ArenaItem {
 	public void draw(MyCanvas canvas) {
 		canvas.save();
 		canvas.translate(getXPosition(), getYPosition());
-		canvas.rotate(rotationAngle);
+		canvas.rotate(rotationAngle); // rotate PlayerRobot to face direction its moving
 		canvas.drawImage(
 	            frames[currentFrameIndex],
 	            -getRadius() * 1.5, // centre horizontally

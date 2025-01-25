@@ -78,8 +78,9 @@ public class SimulationGUI extends Application {
 		
 		// Add items for default arena
 		arena.addItem(new Obstacle(200, 200, 30, "tree")); // add an obstacle
-		arena.addItem(new Robot(400, 300, 20, arena)); // add a robot
-		arena.addItem(new PlayerRobot(100, 100, 20, arena)); // manually add robot to arena
+		arena.addItem(new PlayerRobot(400, 300, 20, arena)); // manually add robot to arena
+		// Add a ShopkeeperNPC to the arena
+		arena.addItem(new ShopkeeperNPC(700, 90, 20, arena));
 		
 		// Set up the GUI Layout
 		BorderPane root = new BorderPane(); // root layout for the GUI
@@ -313,6 +314,7 @@ public class SimulationGUI extends Application {
 		Button predatorRobotButton = new Button("Predator Robot");
 		Button lumberRobotButton = new Button("Lumber Robot");
 		Button minerRobotButton = new Button("Miner Robot");
+		Button playerRobotButton = new Button("Player Robot");
 		
 		// Set up the actions of each button
 		basicRobotButton.setOnAction(e -> {
@@ -340,8 +342,13 @@ public class SimulationGUI extends Application {
 			dialog.close();
 		});
 		
+		playerRobotButton.setOnAction(e -> {
+			addPlayerRobot();
+			dialog.close();
+		});
+		
 		// Layout for the buttons
-		VBox layout = new VBox(10, basicRobotButton, smartRobotButton, predatorRobotButton, lumberRobotButton, minerRobotButton); // vertical box layout with spacing
+		VBox layout = new VBox(10, basicRobotButton, smartRobotButton, predatorRobotButton, lumberRobotButton, minerRobotButton, playerRobotButton); // vertical box layout with spacing
 		layout.setAlignment(Pos.CENTER); // center-align the buttons 
 		Scene scene = new Scene(layout, 300, 300); // create the scene with specified size
 		dialog.setScene(scene);
@@ -448,7 +455,7 @@ public class SimulationGUI extends Application {
 		ImageView woodIcon = new ImageView(new Image(getClass().getResource("/robotCivSim/Assets/wood.png").toExternalForm()));
 		woodIcon.setFitWidth(30); // adjust width of icon
 		woodIcon.setFitHeight(30); // adjust height of the icon
-		woodResourceLabel = new Label("0"); //default to 0
+		woodResourceLabel = new Label("5"); //default to 5 wood
 		woodResourceLabel.setStyle("-fx-font-size: 18px;"); // style the label
 		
 		HBox woodContainer = new HBox(5, woodIcon, woodResourceLabel); // icon and count
@@ -672,6 +679,15 @@ public class SimulationGUI extends Application {
 			timer.start(); // toggle the play state
 			button.setText("Pause"); // update button text
 		}
+	}
+	
+	/**
+	 * Method getCanvas - Returns the instance of MyCanvas used in the SimulationGUI.
+	 *
+	 * @return The MyCanvas instance.
+	 */
+	public MyCanvas getCanvas() {
+	    return this.canvas; // Return the canvas instance
 	}
 	
 	/**

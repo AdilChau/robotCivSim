@@ -23,6 +23,8 @@ public class RobotArena implements Serializable {
 	private transient HashSet<ArenaItem> itemsToRemove; // transient to avoid serialisation
 	private transient List<ArenaItem> itemsToAdd = new ArrayList<>(); // list of items to add
 	private transient SimulationGUI simulationGUI;
+	private transient MyCanvas canvas; // canvas used for drawing (transient to avoid serialisation)
+
 
 
 	
@@ -57,7 +59,7 @@ public class RobotArena implements Serializable {
 		
 		// Draw the arena border
 		// The fill colour is set to null for a transparent background 
-		canvas.drawRectangle(0, 0, canvas.getCanvasWidth(), canvas.getCanvasHeight(), null, Color.BLACK, 5.0); 
+		canvas.drawRectangle(0, 0, canvas.getCanvasWidth(), canvas.getCanvasHeight(), Color.GREEN, Color.BLACK, 5.0); 
 		
 		// Draw each item in the arena by looping through ArenaItem items
 		for (ArenaItem item : items) {
@@ -89,6 +91,14 @@ public class RobotArena implements Serializable {
 	public double getHeight() {
 		return height; // get height
 	} 
+	
+	/** Method getCanvas - This gets the canvas
+	 * 
+	 * @return canvas
+	 */
+	public MyCanvas getCanvas() {
+	    return this.canvas; 
+	}
 	
 	/** Method checkOverlap - This checks if a given position overlaps with any existing item in the arena
 	 * Ensures that when adding new obstacles and robots they don't overlap with already existing ones
