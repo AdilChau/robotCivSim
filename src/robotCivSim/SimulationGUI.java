@@ -45,7 +45,7 @@ public class SimulationGUI extends Application {
 	private double speedMultiplier = 1.0; // multiplier for animation speed
 	private ArenaItem draggedItem = null; // currently dragged item
 	private boolean isDragging = false; // flag to track if an item is being dragged
-    private int woodResourceCount = 0; // counter for wood resources
+    private int woodResourceCount = 5; // counter for wood resources
     private int rockResourceCount = 0; // counter for rock resources
     private Label woodResourceLabel; // label to display wood resource count
     private Label rockResourceLabel; // label to display rock resource count
@@ -480,8 +480,8 @@ public class SimulationGUI extends Application {
      * Increments the wood resource counter and updates the GUI.
      */
     public void incrementWoodResource() {
-        woodResourceCount++;
-        woodResourceLabel.setText(String.valueOf(woodResourceCount));
+        arena.incrementWoodResource(); // increment the count in RobotArena
+        updateResourceDisplay(); // update the GUI labels
     }
 
     /**
@@ -492,6 +492,12 @@ public class SimulationGUI extends Application {
         rockResourceLabel.setText(String.valueOf(rockResourceCount));
     }
 
+    /**
+     * Updates the UI to reflect the updated count
+     */
+    public void updateResourceDisplay() {
+    	woodResourceLabel.setText(String.valueOf(arena.getWoodResourceCount()));
+    }
 	
 	/** Method resetCanvas - This resets the canvas and arena to a blank state
 	 * Removes all entities from the arena and clears the canvas

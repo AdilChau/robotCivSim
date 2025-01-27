@@ -219,7 +219,7 @@ public class SmartRobot extends Robot {
 	 * @throws ClassNotFoundException - If a class required for deserialisation cannot be found
 	 */
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-	    ois.defaultReadObject(); // deserialize all non-transient fields using default deserialization
+	    ois.defaultReadObject(); // deserialise all non-transient fields using default deserilisation
 
 	    // Restore the lightBeamColor from its RGB components
 	    double red = ois.readDouble();   // read the red component (0.0 to 1.0)

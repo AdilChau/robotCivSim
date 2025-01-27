@@ -23,7 +23,7 @@ public class ShopkeeperNPC extends NPC_Robot {
 	 * @param arena - reference to the RobotArena's instance
 	 */
 	public ShopkeeperNPC(double x, double y, double radius, RobotArena arena) {
-		super(x, y, radius, "file:src/robotCivSim/Assets/shopkeeperNPCw.png", arena);
+		super(x, y, radius, "file:src/robotCivSim/Assets/shopkeeperNPC.png", arena);
 	}
 	
 	/** Method interact - This defines the interaction behaviour when the player collied with the NPC
@@ -58,13 +58,26 @@ public class ShopkeeperNPC extends NPC_Robot {
 				// Handle button actions
 				dialog.showAndWait().ifPresent(response -> {
 					if(response == purchaseLumberRobot) {
-						// Add a LumberRobot to the arena
-						double x = player.getXPosition() + 50; // offset new robot's position
-						double y = player.getYPosition() + 50; 
-						arena.addItem(new LumberRobot(x, y, 20, arena)); // Add the LumberRobot
-						if (canvas != null) { // ensure canvas is not null
-							canvas.clearCanvas(); // clear the canvas
-							arena.drawArena(canvas); // redraw with the new Robot
+						if(arena.getWoodResourceCount() >= 5) { // ensures the player has enough to purchase the LumberRobot
+							// Deduct 5 wood from the player's resource
+							arena.decrementWoodResource(5);
+							
+							// Add a LumberRobot to the arena
+							double x = player.getXPosition() + 50; // offset new robot's position
+							double y = player.getYPosition() + 50; 
+							arena.addItem(new LumberRobot(x, y, 20, arena)); // Add the LumberRobot
+							
+							if (canvas != null) { // ensure canvas is not null
+								canvas.clearCanvas(); // clear the canvas
+								arena.drawArena(canvas); // redraw with the new Robot
+							}
+						} else {
+							// Notify player that they do not have enough resources
+							Alert notEnoughResources = new Alert(AlertType.WARNING);
+		                    notEnoughResources.setTitle("Insufficient Resources");
+		                    notEnoughResources.setHeaderText(null);
+		                    notEnoughResources.setContentText("You need at least 5 wood to purchase a LumberRobot!");
+		                    notEnoughResources.showAndWait();
 						}
 					}
 				});

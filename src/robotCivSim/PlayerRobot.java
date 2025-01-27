@@ -35,7 +35,7 @@ public class PlayerRobot extends ArenaItem {
 	public PlayerRobot(double x, double y, double radius, RobotArena arena) {
 		super(x, y, radius);
 		this.arena = arena;
-		this.speed = 2.5;
+		this.speed = 3.5;
 		loadFrames();	
 	}
 	

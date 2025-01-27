@@ -24,7 +24,7 @@ public class RobotArena implements Serializable {
 	private transient List<ArenaItem> itemsToAdd = new ArrayList<>(); // list of items to add
 	private transient SimulationGUI simulationGUI;
 	private transient MyCanvas canvas; // canvas used for drawing (transient to avoid serialisation)
-
+	private int woodResourceCount = 5; // start with 5 wood resources by default
 
 
 	
@@ -123,6 +123,34 @@ public class RobotArena implements Serializable {
 	    }
 	    return false; // No overlap
 	}
+
+	    
+		/** Method incrementWoodResouce - This adds 1 to the total wood resource count
+		 * 
+		 */
+	    // Increment the wood resource count
+	    public void incrementWoodResource() {
+	        woodResourceCount++;
+	    }
+	    
+	    /** Method decrementWoodResource - This takes one away from the total wood count (for purchasing items etc...)
+	     * 
+	     * @param amount
+	     */
+	    // Decrement the wood resource count
+	    public void decrementWoodResource(int amount) {
+	        woodResourceCount -= amount;
+	        simulationGUI.updateResourceDisplay(); // Automatically update the GUI
+	    }
+
+	    /** Getter getWoodResourceCount - Returns the woodResourceCount
+	     * 
+	     * @return - The wood resource count
+	     */
+	    // Get the current wood resource count
+	    public int getWoodResourceCount() {
+	        return woodResourceCount;
+	    }
 
 	
 	/** Method clearArena - This clears all the items from the arena
