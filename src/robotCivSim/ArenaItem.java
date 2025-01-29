@@ -164,6 +164,4 @@ public abstract class ArenaItem implements Serializable { // use of "abstract" f
 	public String getDescription() {
 		return "A normal item in the arena.";
 	}
-	
-	
 }

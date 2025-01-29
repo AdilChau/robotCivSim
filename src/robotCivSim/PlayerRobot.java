@@ -161,6 +161,15 @@ public class PlayerRobot extends ArenaItem {
         }
     }
     
+	/** Method getCurrentFrame - Retrieves the current animation frame
+	 * 
+	 * @return The current image object representing the animation frame
+	 */
+	public Image getCurrentFrame() {
+		return frames[currentFrameIndex]; // frames for lumber robot
+	}
+	
+    
     /** 
      * Robot is not able to be destroyed
      */

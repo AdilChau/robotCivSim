@@ -581,6 +581,10 @@ public class SimulationGUI extends Application {
 		Stage dialog = new Stage();
 		dialog.setTitle("Item Information"); // sets title
 		
+		if (item instanceof NPC_Robot) { // if the item is an NPC
+			return; // display nothing
+		}
+		
 	    // Create labels for item information.
 	    Label nameLabel = new Label("Name: " + item.getName()); // displays item name
 	    Label descriptionLabel = new Label("Description: " + item.getDescription()); // displays item description
@@ -607,19 +611,23 @@ public class SimulationGUI extends Application {
 	    } else if (item instanceof Obstacle) { // if the item is an obstacle
 	    	Obstacle obstacle = (Obstacle) item;
 	    	imageView.setImage(obstacle.getImage()); // gets image for obstacle 
+	    } else if (item instanceof PlayerRobot) { // if item is the Player's Robot
+	    	PlayerRobot playerrobot = (PlayerRobot) item;
+	    	imageView.setImage(playerrobot.getCurrentFrame());
 	    }
 	    imageView.setFitWidth(150); // set width
 	    imageView.setFitHeight(150); // set height
 	    
 	    // Layout for the dialog
 	    VBox layout = new VBox(10, imageView, nameLabel, descriptionLabel, positionLabel, removeButton);
-	    layout.setAlignment(Pos.CENTER); // center align
+	    layout.setAlignment(Pos.CENTER); // centre align
 	    layout.setPadding(new Insets(10)); // leave space at the edges
 	    
 	    // Set up scene and stage
 	    Scene scene = new Scene(layout, 600, 400); // set dimensions for dialog box
 	    dialog.setScene(scene); 
 	    dialog.showAndWait(); // display the dialog and wait for user interaction
+
 	}
 	
 	/** Method addCanvasClickHandler - This adds mouse click handling to the canvas
