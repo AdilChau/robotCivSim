@@ -2,6 +2,7 @@ package robotCivSim;
 
 import java.util.ArrayList; // import ArrayList
 import java.util.HashSet; // for unique removal tracking
+import java.util.Set; // for using hashset as a set
 import java.util.List; // to retrieve a list of basic robots
 
 import javafx.scene.paint.Color; // import Color for border
@@ -194,6 +195,7 @@ public class RobotArena implements Serializable {
 			itemsToAdd = new ArrayList<>();
 		}
 		itemsToAdd.add(item);
+		
 	}
 	
 	/** Method processRemovals - This removes all items that are marked for removal

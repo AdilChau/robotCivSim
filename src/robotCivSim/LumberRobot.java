@@ -141,7 +141,7 @@ public class LumberRobot extends Robot implements Serializable {
 	 */
 	private void handleTargetingTree(long currentTime) {
 	    if (targetTree == null || targetTree.getArena() == null) {
-	        currentState = State.IDLE;
+	        currentState = State.DEFAULT_BEHAVIOR;
 	        return;
 	    }
 
@@ -179,9 +179,11 @@ public class LumberRobot extends Robot implements Serializable {
 	 */
 	private void chopTree() {
 	    if (targetTree instanceof Obstacle && "tree".equals(((Obstacle) targetTree).getType())) {
-	        targetTree.destroy(); // Mine the rock, triggering its destruction
-	        targetTree = null; // Clear the current target
-	        currentState = State.IDLE; // Revert to idle state
+	        targetTree.destroy(); // mine the rock, triggering its destruction
+	        targetTree = null; // clear the current target
+	        currentState = State.IDLE; // revert to idle
+	        lastActionTime = System.currentTimeMillis(); // set cooldown
+	        
 	    }
 	}
 
@@ -212,21 +214,23 @@ public class LumberRobot extends Robot implements Serializable {
 	        return;
 	    }
 
+	    // First priority: Check for any collectible resources 
 	    ResourceItem closestResource = findClosestResource();
 	    if (closestResource != null && closestResource.isReadyToCollect()) {
-	        currentState = State.COLLECTING_RESOURCE; // Prioritize resource collection
+	        currentState = State.COLLECTING_RESOURCE; // prioritise resource collection
 	        return;
 	    }
 
-	    // If no resource, look for the nearest tree
-	    targetTree = findClosestTree();
-	    if (targetTree != null) {
-	        currentState = State.TARGETING_TREE; // Target tree if no resource
+	    // Second Priority: If no resource, look for the nearest tree
+	    Obstacle newTargetTree = findClosestTree();
+	    if (newTargetTree != null) {
+	    	targetTree = newTargetTree; // update the target tree
+	        currentState = State.TARGETING_TREE; // target tree if no resource
 	        return;
 	    }
 
-	    // If no tasks are available, go idle
-	    currentState = State.DEFAULT_BEHAVIOR; // Stay idle if no task available
+	    // If no tasks are available, go back to default
+	    currentState = State.DEFAULT_BEHAVIOR; // revert to default behaviour if no tasks are available
 	}
 	
 	

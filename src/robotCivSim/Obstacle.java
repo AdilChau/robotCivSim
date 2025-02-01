@@ -3,6 +3,10 @@ package robotCivSim;
 import javafx.scene.image.Image; // for obstacle assets
 import javafx.scene.paint.Color; // for fallback
 import java.io.Serializable; // for file save and load
+import java.util.Objects;
+import java.util.Timer; // for obstacle re-spawn
+import java.util.TimerTask; // for obstacle re-spawn
+
 /**
  * Obstacle - Represents a static object in the RobotArena.
  * Obstacles can either be a "tree" or a "rock."
@@ -79,10 +83,35 @@ public class Obstacle extends ArenaItem {
 	        }
 	        // Remove this obstacle from the arena
 	        getArena().scheduleRemoval(this); // schedule safe removal
+	        obstacleRespawn(); // re-spawn obstacle after time limit
 	    }
 	}
 
-
+	/** Method obstacleRespawn - This means that when an obstacle is destroyed by a robot a timer activates and then the object re-spawns at the same coordinates
+	 * Ensures resource item has been collected and then starts timer
+	 */
+	public boolean obstacleRespawn() {
+		Timer timer = new Timer(); // create a timer
+		
+		// Schedule a task to re-spawn the obstacle after 30 seconds (30000 milliseconds)
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				// Ensure the arena exists before re-spawning
+				if (getArena() != null) {
+	                // Create a new obstacle
+	                Obstacle newObstacle = new Obstacle(getXPosition(), getYPosition(), getRadius(), type);
+	                // Set arena reference
+	                javafx.application.Platform.runLater(() -> {
+	                    newObstacle.setArena(getArena()); // treat the re-spawn as a new obstacle so that the LumberRobot target method works
+	                    getArena().scheduleAddition(newObstacle); // schedule for addition to arena
+	                });
+				}
+			}
+		}, 10000); // delay of 10 seconds
+		return true;
+	} 
+	
 	/** Method getType - This gets the type of the obstacle
 	 * 
 	 * @return the type of the obstacle (e.g., "tree", "rock")
@@ -120,4 +149,24 @@ public class Obstacle extends ArenaItem {
 	public String getDescription() {
 		return "A stationary object that blocks robots or is farmed by specific robot type.";
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	    if (this == obj) return true; // Same reference
+	    if (obj == null || getClass() != obj.getClass()) return false; // Type check
+
+	    Obstacle obstacle = (Obstacle) obj;
+
+	    // Compare based on unique attributes (position, type, and size)
+	    return Double.compare(obstacle.getXPosition(), getXPosition()) == 0 &&
+	           Double.compare(obstacle.getYPosition(), getYPosition()) == 0 &&
+	           Double.compare(obstacle.getRadius(), getRadius()) == 0 &&
+	           this.type.equals(obstacle.type);
+	}
+
+	@Override
+	public int hashCode() {
+	    return Objects.hash(getXPosition(), getYPosition(), getRadius(), type);
+	}
+
 }
