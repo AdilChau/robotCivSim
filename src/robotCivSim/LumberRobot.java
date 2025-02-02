@@ -1,6 +1,7 @@
 package robotCivSim;
 
 import javafx.scene.image.Image;
+import robotCivSim.sound.SoundManager;
 
 import java.io.IOException; // for file save and load
 import java.io.ObjectInputStream; // for file save and load
@@ -180,6 +181,9 @@ public class LumberRobot extends Robot implements Serializable {
 	private void chopTree() {
 	    if (targetTree instanceof Obstacle && "tree".equals(((Obstacle) targetTree).getType())) {
 	        targetTree.destroy(); // mine the rock, triggering its destruction
+	        
+	        SoundManager.getInstance().playSound("chop"); // play chop sound
+	        
 	        targetTree = null; // clear the current target
 	        currentState = State.IDLE; // revert to idle
 	        lastActionTime = System.currentTimeMillis(); // set cooldown
