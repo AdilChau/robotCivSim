@@ -114,6 +114,7 @@ public class LumberRobot extends Robot implements Serializable {
 	    if (distanceToResource < getRadius() + resourceToCollect.getRadius()) {
 	    	arena.scheduleRemoval(resourceToCollect); // schedule removal
 	        resourceToCollect.destroy(); // collect the resource 
+	        SoundManager.getInstance().playSound("itemCollect"); // play the itemCollect sound
 	        
 	        SimulationGUI gui = getArena().getSimulationGUI();
 	        if (gui != null) {

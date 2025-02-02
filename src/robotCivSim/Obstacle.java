@@ -108,7 +108,7 @@ public class Obstacle extends ArenaItem {
 	                });
 				}
 			}
-		}, 10000); // delay of 10 seconds
+		}, 30000); // delay of 30 seconds
 		return true;
 	} 
 	

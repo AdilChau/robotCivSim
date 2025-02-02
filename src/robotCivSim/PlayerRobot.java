@@ -2,6 +2,7 @@ package robotCivSim;
 
 import javafx.scene.image.Image; // for animation 
 import javafx.scene.input.KeyEvent; // for player controlled movement
+import robotCivSim.sound.SoundManager;
 
 /** 
  * PlayerRobot class - This represents a user-controlled robot in the arena.
@@ -20,6 +21,7 @@ public class PlayerRobot extends ArenaItem {
 	private double rotationAngle = 0; // angle in degrees
 	private long lastInteractionTime = 0; // Track the last interaction time
 	private static final long INTERACTION_COOLDOWN = 2_000_000_000; // 5 seconds in nanoseconds
+	private boolean isMoving = false; // flag to track movement for audio clip
 
 
 
@@ -133,14 +135,19 @@ public class PlayerRobot extends ArenaItem {
 	 */
 	public void handleKeyPress(KeyEvent event) {
 		switch (event.getCode()) {
-			case W -> { dx = 0; dy = -1; rotationAngle = 270; } // move up
-			case A -> { dx = -1; dy = 0; rotationAngle = 180; } // move left
-			case S -> { dx = 0; dy = 1; rotationAngle = 90; } // move down
-			case D -> { dx = 1; dy = 0; rotationAngle = 0; } // move right
+			case W -> { dx = 0; dy = -1; rotationAngle = 270;} // move up
+			case A -> { dx = -1; dy = 0; rotationAngle = 180;} // move left
+			case S -> { dx = 0; dy = 1; rotationAngle = 90;} // move down
+			case D -> { dx = 1; dy = 0; rotationAngle = 0;} // move right
 	        default -> {
 	            // Log ignored keys for debugging
 	            System.out.println("Unhandled key pressed: " + event.getCode());
 	        }
+		}
+		// If the robot is not already moving, start the movement and play the sound
+		if (!isMoving) {
+			isMoving = true;
+			SoundManager.getInstance().playSound("grass");
 		}
 	}
 	
@@ -158,6 +165,14 @@ public class PlayerRobot extends ArenaItem {
                 // Log ignored keys for debugging
                 System.out.println("Unhandled key pressed: " + event.getCode());
             }
+        }
+        
+        // Check if both horizontal and vertical movement has stopped
+        if (dx == 0 && dy == 0) {
+        	// Reset the movement flag
+        	isMoving = false;
+        	// Stop playing the "grass" sound
+        	SoundManager.getInstance().stopSound("grass");
         }
     }
     

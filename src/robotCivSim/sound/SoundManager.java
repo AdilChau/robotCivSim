@@ -46,9 +46,25 @@ public class SoundManager {
 		URL chopURL = getClass().getResource("/robotCivSim/SoundEffects/chop.wav");
 		if (chopURL != null) {
 			// Create an AudioClip from the URL and store it with the key "chop"
-			soundEffects.put("chop", new AudioClip(chopURL.toExternalForm()));
+			soundEffects.put("chop", new AudioClip(chopURL.toExternalForm())); 
 		} else {
 			System.err.println("Could not load 'chop' sound");
+		}
+		
+		// Load the "Grass" sound effect
+		URL grassURL = getClass().getResource("/robotCivSim/SoundEffects/grass.wav");
+		if (grassURL != null) {
+			soundEffects.put("grass", new AudioClip(grassURL.toExternalForm()));
+		} else {
+			System.err.println("Could not load 'grass' sound");
+		}
+		
+		// Load the "Item Collect" sound effect
+		URL itemCollectURL = getClass().getResource("/robotCivSim/SoundEffects/itemCollect.wav");
+		if (itemCollectURL != null) {
+			soundEffects.put("itemCollect", new AudioClip(itemCollectURL.toExternalForm()));
+		} else {
+			System.err.println("Could not load 'itemCollect' sound");
 		}
  	}
 	
@@ -59,7 +75,7 @@ public class SoundManager {
      * For example, to play the chop sound effect, call:
      * SoundManager.getInstance().playSound("chop");
      *
-     * @param soundKey the key associated with the sound effect to play
+     * @param soundKey - the key associated with the sound effect to play
      */
     public void playSound(String soundKey) {
         AudioClip clip = soundEffects.get(soundKey);
@@ -68,6 +84,18 @@ public class SoundManager {
             clip.play();
         } else {
             System.err.println("Sound not found: " + soundKey);
+        }
+    }
+    
+    /**
+     * Method stopSound - Stops the sound effect corresponding to the given key
+     *
+     * @param soundKey - the key associated with the sound effect to stop
+     */
+    public void stopSound(String soundKey) {
+        AudioClip clip = soundEffects.get(soundKey);
+        if (clip != null) {
+            clip.stop();
         }
     }
     

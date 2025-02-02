@@ -76,11 +76,30 @@ public class SimulationGUI extends Application {
 		arena = new RobotArena(800, 600); // Initialise the arena
 		arena.setSimulationGUI(this);
 		
-		// Add items for default arena
-		arena.addItem(new Obstacle(200, 200, 30, "tree")); // add an obstacle
+		// Add PlayerRobot and NPC's with set coordinates
 		arena.addItem(new PlayerRobot(400, 300, 20, arena)); // manually add robot to arena
 		// Add a ShopkeeperNPC to the arena
 		arena.addItem(new ShopkeeperNPC(700, 90, 20, arena));
+		
+		// Place 5 trees and 5 rocks randomly in the arena using one loop.
+		for (int i = 0; i < 5; i++) {
+		    double xTree, yTree;
+		    // Generate coordinates for a tree until a non-overlapping position is found.
+		    do {
+		        xTree = 30 + Math.random() * (800 - 60);
+		        yTree = 30 + Math.random() * (600 - 60);
+		    } while (arena.checkOverlap(xTree, yTree, 30, null));
+		    arena.addItem(new Obstacle(xTree, yTree, 30, "tree"));
+
+		    double xRock, yRock;
+		    // Generate separate coordinates for a rock until a non-overlapping position is found.
+		    do {
+		        xRock = 30 + Math.random() * (800 - 60);
+		        yRock = 30 + Math.random() * (600 - 60);
+		    } while (arena.checkOverlap(xRock, yRock, 30, null));
+		    arena.addItem(new Obstacle(xRock, yRock, 30, "rock"));
+		}		
+		
 		
 		// Set up the GUI Layout
 		BorderPane root = new BorderPane(); // root layout for the GUI
