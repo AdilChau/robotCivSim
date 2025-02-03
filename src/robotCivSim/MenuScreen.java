@@ -6,6 +6,7 @@ import javafx.scene.layout.VBox;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import robotCivSim.sound.ThemeManager;
 
 /**
  * MenuScreen - Represents the initial start menu screen with a "Start" button.
@@ -27,9 +28,13 @@ public class MenuScreen {
 	}
 	
 	/** 
-	 * Method show - Displays he menu screen with a "Start" button
+	 * Method show - Displays he menu screen with a "Start" and "Exit" button
 	 */
 	public void show() {
+		// Play menu theme
+		ThemeManager.getInstance().playMenuTheme();
+
+		
 		// Create the "Start" button
 		Button startButton = new Button("START"); 
         startButton.setStyle("-fx-font-size: 20px; -fx-background-color: #F2C444; -fx-text-fill: white; " +

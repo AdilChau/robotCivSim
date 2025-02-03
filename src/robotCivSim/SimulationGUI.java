@@ -19,6 +19,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import robotCivSim.sound.ThemeManager;
 import javafx.scene.layout.VBox; // for VBox layout
 import javafx.geometry.Insets; // for VBox edges 
 import javafx.geometry.Pos; // for alignment options
@@ -73,6 +74,10 @@ public class SimulationGUI extends Application {
 	    double stageWidth = stage.getWidth();
 	    double stageHeight = stage.getHeight();
 	    
+	    // Start the game theme which also stops the menu theme
+	    // Create a ThemeManager instance 
+	    ThemeManager.getInstance().playGameTheme();
+
 		arena = new RobotArena(800, 600); // Initialise the arena
 		arena.setSimulationGUI(this);
 		
