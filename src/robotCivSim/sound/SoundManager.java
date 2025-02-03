@@ -66,6 +66,16 @@ public class SoundManager {
 		} else {
 			System.err.println("Could not load 'itemCollect' sound");
 		}
+		
+		// Load the "Item Collect" sound effect
+		URL interactShopURL = getClass().getResource("/robotCivSim/SoundEffects/interactShop.wav");
+		if (interactShopURL != null) {
+			soundEffects.put("interactShop", new AudioClip(interactShopURL.toExternalForm()));
+		} else {
+			System.err.println("Could not load 'interactShop' sound");
+		}
+		
+		
  	}
 	
 

@@ -10,6 +10,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import robotCivSim.sound.SoundManager;
 import javafx.scene.control.Label;
 
 
@@ -88,7 +89,7 @@ public class ShopkeeperNPC extends NPC_Robot {
 
 	            // Create a close button
 	            Button closeButton = new Button("Close");
-	            closeButton.setStyle("-fx-font-size: 14px; -fx-padding: 10; -fx-background-color: #dc3545; -fx-text-fill: white;");
+	            closeButton.setStyle("-fx-font-size: 14px; -fx-padding: 10; -fx-background-color: #dc3545; -fx-text-fill: white;");           
 
 	            // Add event handling for the purchase button
 	            purchaseButton.setOnAction(e -> {
@@ -113,8 +114,10 @@ public class ShopkeeperNPC extends NPC_Robot {
 	            });
 
 	            // Add event handling for the close button
-	            closeButton.setOnAction(e -> dialog.close());
-
+	            closeButton.setOnAction(e -> {	
+	            	dialog.close();
+	            	SoundManager.getInstance().playSound("interactShop"); // play interactShop sound
+	            });
 	            // Assemble the layout
 	            layout.getChildren().addAll(titleLabel, shopkeeperImage, messageLabel, purchaseButtonContainer, closeButton);
 

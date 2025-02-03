@@ -78,6 +78,7 @@ public class PlayerRobot extends ArenaItem {
 	            	long currentTime = System.nanoTime();
 	            	if (currentTime - lastInteractionTime >= INTERACTION_COOLDOWN) {
 		                // Trigger the NPC interaction
+	            		SoundManager.getInstance().playSound("interactShop"); // play interactShop sound
 		                ((ShopkeeperNPC) item).interact(this, arena.getSimulationGUI().getCanvas());
 		                lastInteractionTime = currentTime; // Update the last interaction time
 	            	}
