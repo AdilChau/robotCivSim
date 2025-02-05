@@ -3,24 +3,25 @@ package robotCivSim;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import robotCivSim.sound.SoundManager;
 import javafx.scene.control.Label;
+import java.util.ArrayList; 
+import java.util.List;
 
 
 /**
  * ShopkeeperNPC class-  Represents a stationary NPC that acts as a shopkeeper.
- * Opens a dialog when interacted with, allowing the player to purchase a LumberRobot or close the menu.
+ * Opens a shop interface to allow the player to purchase various items. 
  */
 public class ShopkeeperNPC extends NPC_Robot {
 	private static final long serialVersionUID = 1L;
 	public boolean isInteracting = false; // tracks if the NPC is in interaction state
+	private List<ShopItem> shopItems = new ArrayList<>(); // list of available shop items
 	
 	/**
 	 * Constructor for Shopkeeper
@@ -32,9 +33,13 @@ public class ShopkeeperNPC extends NPC_Robot {
 	 */
 	public ShopkeeperNPC(double x, double y, double radius, RobotArena arena) {
 		super(x, y, radius, "file:src/robotCivSim/Assets/shopkeeperNPC.png", arena);
+		
+		// Initialise the shop items
+		shopItems.add(new ShopItem("LumberRobot", "file:src/robotCivSim/Assets/lumberRobotFrame1.png", 5, RobotType.LUMBER));
 	}
 	
-	/** Method interact - This defines the interaction behaviour when the player collied with the NPC
+	/**
+	 * Method interact - This defines the interaction behaviour when the player collied with the NPC
 	 * Opens a dialog to allow the player to purchase a LumberRobot or close the menu
 	 * 
 	 * @param player - THe PlayerRobot interacting with the NPC.
@@ -63,73 +68,125 @@ public class ShopkeeperNPC extends NPC_Robot {
 	            Label titleLabel = new Label("Welcome to the shop!");
 	            titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
-	            // Add an image for the shopkeeper (optional)
+	            // Add an image for the shopkeeper
 	            ImageView shopkeeperImage = new ImageView(new Image("file:src/robotCivSim/Assets/shopkeeperNPC.png"));
 	            shopkeeperImage.setFitWidth(100);
 	            shopkeeperImage.setFitHeight(100);
 
-	            // Add a message
-	            Label messageLabel = new Label("Choose an action:");
-	            messageLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #444;");
+	            // Shop grid for items
+	            GridPane shopGrid = new GridPane();
+	            shopGrid.setHgap(10);
+	            shopGrid.setVgap(10);
+	            shopGrid.setAlignment(Pos.CENTER); // centre align
+	            
+	            populateShopGrid(shopGrid, player, canvas);
+	            
+                // Close button
+                Button closeButton = new Button("Close");
+                closeButton.setStyle("-fx-font-size: 14px; -fx-padding: 10; -fx-background-color: #dc3545; -fx-text-fill: white;");
+                closeButton.setOnAction(e -> {
+                    dialog.close();
+                    isInteracting = false;
+                });
 
-	            // Create a button to purchase a LumberRobot with a cost display
-	            HBox purchaseButtonContainer = new HBox(10);
-	            purchaseButtonContainer.setAlignment(Pos.CENTER);
+                layout.getChildren().addAll(titleLabel, shopkeeperImage, shopGrid, closeButton);
 
-	            Button purchaseButton = new Button("Purchase LumberRobot");
-	            purchaseButton.setStyle("-fx-font-size: 14px; -fx-padding: 10; -fx-background-color: #28a745; -fx-text-fill: white;");
-
-	            // Add a wood resource icon and cost
-	            ImageView woodIcon = new ImageView(new Image("file:src/robotCivSim/Assets/wood.png"));
-	            woodIcon.setFitWidth(50); // scale wood icon image
-	            woodIcon.setFitHeight(50); // scale wood icon image
-	            Label woodCostLabel = new Label("x5");
-	            woodCostLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-	            purchaseButtonContainer.getChildren().addAll(purchaseButton, woodIcon, woodCostLabel);
-
-	            // Create a close button
-	            Button closeButton = new Button("Close");
-	            closeButton.setStyle("-fx-font-size: 14px; -fx-padding: 10; -fx-background-color: #dc3545; -fx-text-fill: white;");           
-
-	            // Add event handling for the purchase button
-	            purchaseButton.setOnAction(e -> {
-	                if (arena.getWoodResourceCount() >= 5) { // Ensure the player has enough wood
-	                    arena.decrementWoodResource(5); // Deduct 5 wood
-	                    double x = player.getXPosition() + 50; // Offset new robot's position
-	                    double y = player.getYPosition() + 50;
-	                    arena.addItem(new LumberRobot(x, y, 20, arena)); // Add the LumberRobot
-
-	                    if (canvas != null) {
-	                        canvas.clearCanvas();
-	                        arena.drawArena(canvas); // Redraw the arena
-	                    }
-	                } else {
-	                    // Show a warning if insufficient resources
-	                    Alert notEnoughResources = new Alert(Alert.AlertType.WARNING);
-	                    notEnoughResources.setTitle("Insufficient Resources");
-	                    notEnoughResources.setHeaderText(null);
-	                    notEnoughResources.setContentText("You need at least 5 wood to purchase a LumberRobot!");
-	                    notEnoughResources.showAndWait();
-	                }
-	            });
-
-	            // Add event handling for the close button
-	            closeButton.setOnAction(e -> {	
-	            	dialog.close();
-	            	SoundManager.getInstance().playSound("interactShop"); // play interactShop sound
-	            });
-	            // Assemble the layout
-	            layout.getChildren().addAll(titleLabel, shopkeeperImage, messageLabel, purchaseButtonContainer, closeButton);
-
-	            // Create and set the scene
-	            Scene scene = new Scene(layout, 300, 400);
-	            dialog.setScene(scene);
-	            dialog.showAndWait();
-	        } finally {
-	            isInteracting = false; // Reset interaction state when dialog is closed
-	        }
+                Scene scene = new Scene(layout, 400, 600);
+                dialog.setScene(scene);
+                dialog.showAndWait();
+            } finally {
+                isInteracting = false;
+            }
 	    });
 	}
-
-
+	
+	/** 
+	 * Method populateShopGrid - Populates the shop grid with available items
+	 * 
+	 * @param shopGrid - The GridPane to populate
+	 * @param player - Reference to the PlayerRobot
+	 * @param canvas - Reference to the MyCanvas instance
+	 */
+	public void populateShopGrid(GridPane shopGrid, PlayerRobot player, MyCanvas canvas) {
+		for(int i = 0; i < shopItems.size(); i++) {
+			ShopItem item = shopItems.get(i);
+			
+			VBox itemBox = new VBox(10);
+			itemBox.setAlignment(Pos.CENTER); 
+			itemBox.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: white;");
+			
+			ImageView itemImage = new ImageView(new Image(item.getImagePath()));
+			itemImage.setFitWidth(50);
+			itemImage.setFitHeight(50);
+			
+			// Label for item name
+			Label itemName = new Label(item.getName());
+			itemName.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+			
+			// Label for item cost
+			Label itemCost = new Label(item.getCost() + "x Wood");
+			itemCost.setStyle("-fx-font-size: 12px;");
+			
+			// Create purchase button
+			Button purchaseButton = new Button("Buy");
+            purchaseButton.setStyle("-fx-font-size: 12px; -fx-background-color: #28a745; -fx-text-fill: white;");
+            purchaseButton.setOnAction(e -> handlePurchase(item, player, canvas));
+            
+            itemBox.getChildren().addAll(itemImage, itemName, itemCost, purchaseButton);
+            
+            shopGrid.add(itemBox,  i % 2,  i / 2); // Arrange items in a grid 			
+		}
+	}
+	
+	/**
+	 * Method handlePurchase - Handles the purchase logic for a shop item
+	 * 
+	 * @param item - The ShopItem being purchased
+	 * @param player - The PlayerRobot making the purchase
+	 * @param canvas - The MyCanvas instance
+	 */
+	private void handlePurchase(ShopItem item, PlayerRobot player, MyCanvas canvas) {
+		// Ensure user has enough of the wood resource
+		if (arena.getWoodResourceCount() >= item.getCost()) {
+			arena.decrementWoodResource(item.getCost());
+			double x = player.getXPosition() + 50; // offset the new Robot's position
+			double y = player.getYPosition() + 50; 
+			arena.addItem(createRobot(item.getType(), x, y, arena));
+			canvas.clearCanvas();
+			arena.drawArena(canvas); // re-draw the arena
+		} else {
+			// Send alert to user
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Insufficient Resources");
+            alert.setHeaderText(null);
+            alert.setContentText("You need at least " + item.getCost() + " wood to buy this item.");
+            alert.showAndWait();
+		}
+	}
+	
+	/** 
+	 * Method createRobot - Creates a robot based on the specified type
+	 * 
+     * @param type - The type of robot to create
+     * @param x - x-coordinate of the robot
+     * @param y - y-coordinate of the robot
+     * @param arena - Reference to the RobotArena
+     * @return - The created robot instance
+	 */
+	private Robot createRobot(RobotType type, double x, double y, RobotArena arena) {
+		return switch (type) {
+			case LUMBER -> new LumberRobot(x, y, 20, arena); // add LumberRobot to the arena
+			case MINER -> new MinerRobot(x, y, 20, arena); // 
+			default -> null; // default
+		};
+	}
+	
+	/**
+	 * Method addShopItem - Adds a new item to the shop when certain conditions are met
+	 * 
+	 * @param item - The new ShopItem to add
+	 */
+	public void addShopItem(ShopItem item) {
+		shopItems.add(item);
+	}
 }
