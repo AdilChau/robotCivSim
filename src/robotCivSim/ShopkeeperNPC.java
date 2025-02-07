@@ -10,6 +10,8 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import robotCivSim.sound.SoundManager;
 import javafx.scene.control.Label;
+
+import java.io.File;
 import java.util.ArrayList; 
 import java.util.List;
 
@@ -35,7 +37,8 @@ public class ShopkeeperNPC extends NPC_Robot {
 		super(x, y, radius, "file:src/robotCivSim/Assets/shopkeeperNPC.png", arena);
 		
 		// Initialise the shop items
-		shopItems.add(new ShopItem("LumberRobot", "file:src/robotCivSim/Assets/lumberRobotFrame1.png", 5, RobotType.LUMBER));
+		shopItems.add(new ShopItem("LumberRobot", "lumberRobotFrame1.png", 5, RobotType.LUMBER));
+
 	}
 	
 	/**
@@ -55,6 +58,8 @@ public class ShopkeeperNPC extends NPC_Robot {
 
 	    Platform.runLater(() -> {
 	        try {
+	        	checkAndAddNewItems(); // dynamically add new items based on resource count
+	        	
 	            // Create a new stage for the custom dialog
 	            Stage dialog = new Stage();
 	            dialog.setTitle("Shopkeeper");
@@ -91,7 +96,7 @@ public class ShopkeeperNPC extends NPC_Robot {
 
                 layout.getChildren().addAll(titleLabel, shopkeeperImage, shopGrid, closeButton);
 
-                Scene scene = new Scene(layout, 400, 600);
+                Scene scene = new Scene(layout, Math.min(shopItems.size() * 400, 500), 600);
                 dialog.setScene(scene);
                 dialog.showAndWait();
             } finally {
@@ -115,9 +120,11 @@ public class ShopkeeperNPC extends NPC_Robot {
 			itemBox.setAlignment(Pos.CENTER); 
 			itemBox.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: white;");
 			
-			ImageView itemImage = new ImageView(new Image(item.getImagePath()));
-			itemImage.setFitWidth(50);
-			itemImage.setFitHeight(50);
+			// Dynamically load the image
+			Image itemImage = loadImage(item.getImagePath());
+			ImageView itemImageView = new ImageView(itemImage);
+			itemImageView.setFitWidth(50);
+			itemImageView.setFitHeight(50);
 			
 			// Label for item name
 			Label itemName = new Label(item.getName());
@@ -132,7 +139,7 @@ public class ShopkeeperNPC extends NPC_Robot {
             purchaseButton.setStyle("-fx-font-size: 12px; -fx-background-color: #28a745; -fx-text-fill: white;");
             purchaseButton.setOnAction(e -> handlePurchase(item, player, canvas));
             
-            itemBox.getChildren().addAll(itemImage, itemName, itemCost, purchaseButton);
+            itemBox.getChildren().addAll(itemImageView, itemName, itemCost, purchaseButton);
             
             shopGrid.add(itemBox,  i % 2,  i / 2); // Arrange items in a grid 			
 		}
@@ -164,6 +171,16 @@ public class ShopkeeperNPC extends NPC_Robot {
 		}
 	}
 	
+	/**
+	 * Method checkAndAddNewItems - Checks that the Player has now got 10 or more wood
+	 * If they do the Shopkeeper updates to now allow MinerRobots to be purchased
+	 */
+	public void checkAndAddNewItems() {
+		if(arena.getWoodResourceCount() >= 10 && shopItems.stream().noneMatch(item -> item.getName().equals("MinerRobot"))) {
+			shopItems.add(new ShopItem("MinerRobot", "minerRobotFrame1.png", 5, RobotType.MINER)); // add the miner robot to the shop
+		}
+	}
+	
 	/** 
 	 * Method createRobot - Creates a robot based on the specified type
 	 * 
@@ -176,9 +193,22 @@ public class ShopkeeperNPC extends NPC_Robot {
 	private Robot createRobot(RobotType type, double x, double y, RobotArena arena) {
 		return switch (type) {
 			case LUMBER -> new LumberRobot(x, y, 20, arena); // add LumberRobot to the arena
-			case MINER -> new MinerRobot(x, y, 20, arena); // 
-			default -> null; // default
+			case MINER -> new MinerRobot(x, y, 20, arena); // add MinerRobot to the arena
+			default -> throw new IllegalArgumentException("Unsupported robot type: " + type); // default message
 		};
+	}
+	
+	/**
+	 * Method loadImage - is a helper method that dynamically constructs the path and loads the image
+	 * 
+	 * @param imagePath - a string representing the image path
+	 */
+	public Image loadImage(String imagePath) {
+		File file = new File("src/robotCivSim/Assets/" + imagePath);
+		if (!file.exists()) {
+			throw new RuntimeException("Image not found" + file.getAbsolutePath());
+		}
+		return new Image(file.toURI().toString());
 	}
 	
 	/**
