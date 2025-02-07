@@ -51,6 +51,15 @@ public class SoundManager {
 			System.err.println("Could not load 'chop' sound");
 		}
 		
+		// Load the "Mine" sound effect
+		URL mineURL = getClass().getResource("/robotCivSim/SoundEffects/mine.wav");
+		if (mineURL != null) {
+			// Create an AudioClip from the URL and store it with the key "chop"
+			soundEffects.put("mine", new AudioClip(mineURL.toExternalForm())); 
+		} else {
+			System.err.println("Could not load 'mine' sound");
+		}
+		
 		// Load the "Grass" sound effect
 		URL grassURL = getClass().getResource("/robotCivSim/SoundEffects/grass.wav");
 		if (grassURL != null) {

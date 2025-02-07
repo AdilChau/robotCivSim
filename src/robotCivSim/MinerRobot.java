@@ -1,6 +1,7 @@
 package robotCivSim;
 
 import javafx.scene.image.Image;
+import robotCivSim.sound.SoundManager;
 
 import java.io.IOException; // for file save and load
 import java.io.ObjectInputStream; // for file save and load
@@ -98,7 +99,7 @@ public class MinerRobot extends Robot implements Serializable {
 	private void handleCollectingResource(long currentTime) {
 	    ResourceItem resourceToCollect = findClosestResource();
 	    if (resourceToCollect == null || !resourceToCollect.isReadyToCollect()) {
-	        currentState = State.IDLE; // go back to idle if no resource to collect
+	        currentState = State.DEFAULT_BEHAVIOR; // go back to default behaviour if no resource to collect
 	        return;
 	    }
 	
@@ -108,13 +109,17 @@ public class MinerRobot extends Robot implements Serializable {
 	
 	    if (distanceToResource < getRadius() + resourceToCollect.getRadius()) {
 	    	arena.scheduleRemoval(resourceToCollect); // schedule removal
-	        resourceToCollect.destroy(); // collect the resource 
+	        resourceToCollect.destroy(); // collect the resource
+
+	        SoundManager.getInstance().playSound("itemCollect"); // play the itemCollect sound
+	        
 	        SimulationGUI gui = getArena().getSimulationGUI();
 	        if (gui != null) {
 	            gui.incrementRockResource(); // Increment rock counter in GUI
 	        }
+	        
 	        lastActionTime = currentTime; // set cooldown
-	        currentState = State.IDLE; // return to idle after collecting 
+	        currentState = State.DEFAULT_BEHAVIOR; // return to default behaviour after collecting 
 	    } else {
 	        double angleToResource = Math.atan2(dyToResource, dxToResource);
 	        dx = Math.cos(angleToResource) * speed;
@@ -134,7 +139,7 @@ public class MinerRobot extends Robot implements Serializable {
 	 */
 	private void handleTargetingRock(long currentTime) {
 	    if (targetRock == null || targetRock.getArena() == null) {
-	        currentState = State.IDLE;
+	        currentState = State.DEFAULT_BEHAVIOR;
 	        return;
 	    }
 
@@ -173,8 +178,12 @@ public class MinerRobot extends Robot implements Serializable {
 	private void mineRock() {
 	    if (targetRock instanceof Obstacle && "rock".equals(((Obstacle) targetRock).getType())) {
 	        targetRock.destroy(); // Mine the rock, triggering its destruction
+	        
+	        SoundManager.getInstance().playSound("mine"); // play mine sound
+	        
 	        targetRock = null; // Clear the current target
 	        currentState = State.IDLE; // Revert to idle state
+	        lastActionTime = System.currentTimeMillis(); // set cooldown
 	    }
 	}
 
@@ -216,8 +225,8 @@ public class MinerRobot extends Robot implements Serializable {
 	          return;
 	    } 
 	    
-	    // If no tasks are available, go idle
-	    currentState = State.DEFAULT_BEHAVIOR; // stay idle if no task available
+	    // If no tasks are available, go default behaviour
+	    currentState = State.DEFAULT_BEHAVIOR; // stay  if no task available
 	}
 	
 	

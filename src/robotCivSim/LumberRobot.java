@@ -10,7 +10,6 @@ import java.io.Serializable; // for file save and load
 
 /** LumberRobot - A robot that targets trees and removes them on collision.
  * Inherits from the robot class and overrides specific behaviours to handle trees.
- * Uses A* pathfinding algorithm to navigate the arena and avoid obstacles
  */
 public class LumberRobot extends Robot implements Serializable {
 	private static final long serialVersionUID = 1L; // serialisation ID
@@ -19,8 +18,6 @@ public class LumberRobot extends Robot implements Serializable {
 	private long lastActionTime = 0; 
 	private ArenaItem rememberedObstacle; // tracks the current obstacle
 	private long obstacleAvoidanceEndTime = 0; // tracks when to stop avoiding the obstacle
-	private long lastCollisionTime = 0;
-	private static final long COLLISION_COOLDOWN = 200; // 200ms cooldown
 	
 	/** 
 	 * Enum state for prioritising tasks
@@ -103,7 +100,7 @@ public class LumberRobot extends Robot implements Serializable {
 	private void handleCollectingResource(long currentTime) {
 	    ResourceItem resourceToCollect = findClosestResource();
 	    if (resourceToCollect == null || !resourceToCollect.isReadyToCollect()) {
-	        currentState = State.DEFAULT_BEHAVIOR; // go back to idle if no resource to collect
+	        currentState = State.DEFAULT_BEHAVIOR; // go back to default behaviour if no resource to collect
 	        return;
 	    }
 	
