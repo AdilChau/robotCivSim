@@ -19,9 +19,8 @@ public class PlayerRobot extends ArenaItem {
 	private static final long FRAME_DURATION = 200_000_000; // 200ms per frame
 	private RobotArena arena; // reference to RobotArena arena
 	private double rotationAngle = 0; // angle in degrees
-	private long lastInteractionTime = 0; // Track the last interaction time
-	private static final long INTERACTION_COOLDOWN = 2_000_000_000; // 5 seconds in nanoseconds
 	private boolean isMoving = false; // flag to track movement for audio clip
+	private ShopkeeperNPC nearbyShopkeeper = null; // track the nearest shopkeeper
 
 
 
@@ -65,34 +64,24 @@ public class PlayerRobot extends ArenaItem {
 	    double newX = getXPosition() + dx * speed;
 	    double newY = getYPosition() + dy * speed;
 
-	    boolean isInteractingWithNPC = false; // track if the currently interacting with NPC
+	    nearbyShopkeeper = null; // Reset nearby shopkeeper detection
 	    
-	    // Detect collision with NPCs
 	    for (ArenaItem item : arena.getItems()) {
-	        if (item instanceof ShopkeeperNPC) { // Handle Shopkeeper-specific interaction
-	            double dx = newX - item.getXPosition();
-	            double dy = newY - item.getYPosition();
+	        if (item instanceof ShopkeeperNPC shopkeeper) { // handle Shopkeeper-specific interaction
+	            double dx = newX - shopkeeper.getXPosition();
+	            double dy = newY - shopkeeper.getYPosition();
 	            double distance = Math.sqrt(dx * dx + dy * dy);
 
-	            if (distance < (getRadius() + item.getRadius())) {
-	            	long currentTime = System.nanoTime();
-	            	if (currentTime - lastInteractionTime >= INTERACTION_COOLDOWN) {
-		                // Trigger the NPC interaction
-	            		SoundManager.getInstance().playSound("interactShop"); // play interactShop sound
-		                ((ShopkeeperNPC) item).interact(this, arena.getSimulationGUI().getCanvas());
-		                lastInteractionTime = currentTime; // Update the last interaction time
-	            	}
-	                isInteractingWithNPC = true;
+	            if (distance < getRadius() + shopkeeper.getRadius() + 50) { // close enough to trigger "E" indicator
+	                nearbyShopkeeper = shopkeeper; // store reference to the nearby shopkeeper
 	                break;
-	            } else {
-	                // Reset the interaction state if no collision
-	                ((NPC_Robot) item).setInteracting(false);
+	                
+	            	}
 	            }
 	        }
-	    }
 	    
-	    if (!isInteractingWithNPC && !arena.checkOverlap(newX, newY, getRadius(), this)) {
-	        // Pass `this` to exclude self and move the player
+	    // Move the player if not blocked by obstacles
+	    if (!arena.checkOverlap(newX, newY, getRadius(), this)) {
 	        setPosition(newX, newY, arena.getWidth(), arena.getHeight());
 	    }
 	    
@@ -126,6 +115,11 @@ public class PlayerRobot extends ArenaItem {
 	            getRadius() * 3  // scaled height
 		);
 		canvas.restore();
+		
+		// Draw the "E" key indicator if near a shopkeeper
+		if (nearbyShopkeeper != null) {
+			nearbyShopkeeper.drawKeyIndicator(canvas);
+		}
 	}
 	
 	/**
@@ -140,6 +134,13 @@ public class PlayerRobot extends ArenaItem {
 			case A -> { dx = -1; dy = 0; rotationAngle = 180;} // move left
 			case S -> { dx = 0; dy = 1; rotationAngle = 90;} // move down
 			case D -> { dx = 1; dy = 0; rotationAngle = 0;} // move right
+			case E -> { // Press "E" to interact with shopkeeper
+				if (nearbyShopkeeper != null) {
+					SoundManager.getInstance().playSound("interactShop"); // play the interaction sound
+					nearbyShopkeeper.interact(this, arena.getSimulationGUI().getCanvas()); // trigger interaction
+				}
+				
+			}
 	        default -> {
 	            // Log ignored keys for debugging
 	            System.out.println("Unhandled key pressed: " + event.getCode());

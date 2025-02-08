@@ -197,7 +197,17 @@ public class ShopkeeperNPC extends NPC_Robot {
 			default -> throw new IllegalArgumentException("Unsupported robot type: " + type); // default message
 		};
 	}
-	
+
+	/**
+	 * Method drawKeyIndicator - Draws the "E" key indicator above the Shopkeeper when the Player is near
+	 *
+	 * @param canvas - The canvas to draw on.
+	 */
+	public void drawKeyIndicator(MyCanvas canvas) {
+	    canvas.drawKeyIndicator(getXPosition(), getYPosition() - getRadius() * 2);
+	}
+
+	 
 	/**
 	 * Method loadImage - is a helper method that dynamically constructs the path and loads the image
 	 * 

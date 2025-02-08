@@ -3,6 +3,8 @@ package robotCivSim;
 //Import necessary built-in classes for MyCanvas
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.geometry.VPos;
 import javafx.scene.image.Image; // to add assets
@@ -190,4 +192,25 @@ public class MyCanvas {
 		gc.setFill(fillColor); // set the fill colour
 		gc.fillArc(x,  y, width, height, startAngle, arcExtent, ArcType.ROUND); // draw arc
 	}
+	
+	/**
+	 * Method drawKeyIndicator - Draws an "E" key interaction indicator above an NPC
+	 *
+	 * @param x - X-coordinate of the NPC.
+	 * @param y - Y-coordinate of the NPC.
+	 */
+	public void drawKeyIndicator(double x, double y) {
+	    gc.setFill(Color.WHITE);
+	    gc.fillRect(x - 15, y - 30, 30, 30); // draw the background of the key
+	    gc.setStroke(Color.BLACK);
+	    gc.setLineWidth(2); // reduce the border thickness
+	    gc.strokeRect(x - 15, y - 30, 30, 30); // draw the border
+
+	    gc.setFill(Color.BLACK);
+	    gc.setFont(Font.font("Arial", FontWeight.BOLD, 16)); // Set bold font
+	    gc.setTextAlign(TextAlignment.CENTER);
+	    gc.setTextBaseline(VPos.CENTER);
+	    gc.fillText("E", x - 5, y - 15); // draw the letter "E" in the centre
+	}
+
 }
