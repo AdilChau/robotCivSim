@@ -130,10 +130,10 @@ public class PlayerRobot extends ArenaItem {
 	 */
 	public void handleKeyPress(KeyEvent event) {
 		switch (event.getCode()) {
-			case W -> { dx = 0; dy = -1; rotationAngle = 270;} // move up
-			case A -> { dx = -1; dy = 0; rotationAngle = 180;} // move left
-			case S -> { dx = 0; dy = 1; rotationAngle = 90;} // move down
-			case D -> { dx = 1; dy = 0; rotationAngle = 0;} // move right
+			case W -> { dx = 0; dy = -1; rotationAngle = 270; startMovementSound();} // move up
+			case A -> { dx = -1; dy = 0; rotationAngle = 180; startMovementSound();} // move left
+			case S -> { dx = 0; dy = 1; rotationAngle = 90; startMovementSound();} // move down
+			case D -> { dx = 1; dy = 0; rotationAngle = 0; startMovementSound();} // move right
 			case E -> { // Press "E" to interact with shopkeeper
 				if (nearbyShopkeeper != null) {
 					SoundManager.getInstance().playSound("interactShop"); // play the interaction sound
@@ -146,11 +146,16 @@ public class PlayerRobot extends ArenaItem {
 	            System.out.println("Unhandled key pressed: " + event.getCode());
 	        }
 		}
-		// If the robot is not already moving, start the movement and play the sound
-		if (!isMoving) {
-			isMoving = true;
-			SoundManager.getInstance().playSound("grass");
-		}
+	}
+	
+	/** 
+	 * Method startMovementSound - Starts the grass movement sound effect only if not already playing.
+	 */
+	private void startMovementSound() {
+	    if (!isMoving) {
+	        isMoving = true;
+	        SoundManager.getInstance().playSound("grass");
+	    }
 	}
 	
 	/**
