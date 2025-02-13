@@ -132,6 +132,13 @@ public class RobotArena implements Serializable {
 	    // Increment the wood resource count
 	    public void incrementWoodResource() {
 	        woodResourceCount++;
+	        
+	        // Once 10 wood has been collected notify the player to go to the shop
+	        if (woodResourceCount >= 10) {
+	        	if (simulationGUI != null) {
+	        		simulationGUI.notifyPlayer(); 
+	        	}
+	        }
 	    }
 	    
 	    /** Method decrementWoodResource - This takes one away from the total wood count (for purchasing items etc...)

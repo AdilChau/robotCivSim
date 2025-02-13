@@ -10,6 +10,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button; // import button
 import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar; // import toolbar
@@ -42,14 +43,18 @@ public class SimulationGUI extends Application {
 	private RobotArena arena; // RobotArena managing the simulation
 	private MyCanvas canvas; // custom canvas for drawing
 	private AnimationTimer timer; // animation timer for controlling simulation 
-	private boolean isPaused = false; // tracks if the animation is paused or running
+	private ArenaItem draggedItem = null; // currently dragged item	private ArenaItem draggedItem = null; // currently dragged item
+	
 	private double speedMultiplier = 1.0; // multiplier for animation speed
-	private ArenaItem draggedItem = null; // currently dragged item
-	private boolean isDragging = false; // flag to track if an item is being dragged
     private int woodResourceCount = 5; // counter for wood resources
     private int rockResourceCount = 0; // counter for rock resources
+    
     private Label woodResourceLabel; // label to display wood resource count
     private Label rockResourceLabel; // label to display rock resource count
+    
+    private boolean woodNotificationShown = false; // flag to track if the notification has been shown
+	private boolean isDragging = false; // flag to track if an item is being dragged
+	private boolean isPaused = false; // tracks if the animation is paused or running
 	
 	/** Method Start - This sets up Menu stage and allows the user to proceed to the simulation
 	 * 
@@ -104,7 +109,6 @@ public class SimulationGUI extends Application {
 		    } while (arena.checkOverlap(xRock, yRock, 30, null));
 		    arena.addItem(new Obstacle(xRock, yRock, 30, "rock"));
 		}		
-		
 		
 		// Set up the GUI Layout
 		BorderPane root = new BorderPane(); // root layout for the GUI
@@ -175,7 +179,7 @@ public class SimulationGUI extends Application {
 	        stage.setMaximized(isMaximized);
 
 	    });
-		
+	    
 		// Animation Timer for movement
 		timer = new AnimationTimer() {
 			private long lastUpdate = 0; // to control speed
@@ -202,6 +206,29 @@ public class SimulationGUI extends Application {
 		
 		timer.start();
 		addCanvasClickHandler(drawCanvas); // allows for items to be selected
+	}
+	
+	/**
+	 * Method notifyPlayer - Sends alert to direct the player on what they should be doing
+	 * After conditions are met this acts as a guide to show the player what's new
+	 */
+	public void notifyPlayer() {
+		
+		// When 10 wood has been collected notify the player
+    	if (arena.getWoodResourceCount() == 10) {
+    		// Prevent multiple notifications using a flag
+    		if (woodNotificationShown) return;
+    		woodNotificationShown = true; // set flag to true to stop alert repeating
+    		
+    		Platform.runLater(() -> { // Ensure the alert is executed in the UI thread
+				// Alert the player that new items are available for purchase
+				Alert alert = new Alert(Alert.AlertType.INFORMATION); 
+				alert.setTitle("New Robot ready for Purchase");
+				alert.setHeaderText(null);
+				alert.setContentText("Now that you have collected 10 wood, why not visit the shop again?");
+				alert.showAndWait();
+    		});
+    	}
 	}
 	
 	/** Method CreateMenuBar - This sets up the menu bar with some placeholder options
