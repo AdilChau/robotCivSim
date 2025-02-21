@@ -4,6 +4,8 @@ import java.util.ArrayList; // import ArrayList
 import java.util.HashSet; // for unique removal tracking
 import java.util.Set; // for using hashset as a set
 import java.util.List; // to retrieve a list of basic robots
+import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javafx.scene.paint.Color; // import Color for border
 
@@ -13,6 +15,7 @@ import java.io.Serializable; // for file save and load
 
 /** RobotArena - Manages the arena, including size and the items within it.
  * Stores and interacts with robots and obstacles. 
+ * Deals with lighting for day-night cycle and enemy robot spawns
  * 
  */
 public class RobotArena implements Serializable {
@@ -20,13 +23,15 @@ public class RobotArena implements Serializable {
 	// Attributes for arena size and the ArrayList of items
 	private double width; // width of arena
 	private double height; // height of arena
-	private ArrayList<ArenaItem> items; // make an ArrayList of ArenaItems
+	private CopyOnWriteArrayList<ArenaItem> items; // make an ArrayList of ArenaItems
 	private transient HashSet<ArenaItem> itemsToRemove; // transient to avoid serialisation
 	private transient List<ArenaItem> itemsToAdd = new ArrayList<>(); // list of items to add
 	private transient SimulationGUI simulationGUI;
 	private transient MyCanvas canvas; // canvas used for drawing (transient to avoid serialisation)
 	private int woodResourceCount = 5; // start with 5 wood resources by default
-
+	private GameClock gameClock;
+	private int currentHour = 6;
+	private boolean isNight;
 
 	
 	/** Constructor for RobotArena 
@@ -38,8 +43,10 @@ public class RobotArena implements Serializable {
 	public RobotArena(double width, double height) {
 		this.width = width; // initialise width
 		this.height = height; // initialise height
-		this.items = new ArrayList<>(); // create an empty list of items
+		this.items = new CopyOnWriteArrayList<ArenaItem>(); // create an empty list of items
 		this.itemsToRemove = new HashSet<>(); // initialise the removal set
+		
+		gameClock = new GameClock(this);
 	}
 	
 	/** Method addItem - This adds an item to the arena
@@ -73,7 +80,7 @@ public class RobotArena implements Serializable {
 	 * 
 	 * @return list of all ArenaItems
 	 */
-	public ArrayList<ArenaItem> getItems() {
+	public CopyOnWriteArrayList<ArenaItem> getItems() {
 		return items; // get items
 	}
 	
@@ -125,40 +132,91 @@ public class RobotArena implements Serializable {
 	    return false; // No overlap
 	}
 
+	/**
+	 * Method setTimeOfDay - Updates the current hour and applies lighting changes
+	 * 
+	 * @param hour - The new hour in-game
+	 */
+	public void setTimeOfDay(int hour) {
+		this.currentHour = hour;
+		boolean wasNight = isNight;
+		isNight = (hour >= 8 || hour < 6);
+		
+        if (isNight && !wasNight) {
+            spawnEnemyRobots(); // add enemies
+        } else if (!isNight && wasNight) {
+            removeEnemyRobots(); // remove enemies
+        }
+	}
+	
+    /**
+     * Method spawnEnemyRobots - Spawns enemy robots at night
+     */
+    public void spawnEnemyRobots() {
+        for (int i = 0; i < 3; i++) { // spawn 3 enemies
+            double x = Math.random() * 800;
+            double y = Math.random() * 600;
+            items.add(new SwordEnemyRobot(x, y, this));
+        }
+    }
+    
+    /**
+     *  Method removeEnemyRobots - Removes all enemy robots at sunrise
+     */
+    public void removeEnemyRobots() {
+        Iterator<ArenaItem> iterator = items.iterator();
+        while (iterator.hasNext()) {
+            ArenaItem item = iterator.next();
+            if (item instanceof EnemyRobot) {
+                iterator.remove(); // remove robots of enemy type
+            }
+        }
+    }
+    
+    /**
+     *Method applyLighting - Applies lighting changes to the arena.
+     */
+    private void applyLighting(MyCanvas canvas) {
+        double darknessLevel = 0;
+        if (currentHour >= 18 || currentHour < 6) {
+            darknessLevel = (currentHour >= 21 || currentHour < 3) ? 0.6 : 0.3;
+        }
+        canvas.applyLightingOverlay(darknessLevel);
+    }
 	    
-		/** Method incrementWoodResouce - This adds 1 to the total wood resource count
-		 * 
-		 */
-	    // Increment the wood resource count
-	    public void incrementWoodResource() {
-	        woodResourceCount++;
+	/** 
+	* Method incrementWoodResouce - This adds 1 to the total wood resource count
+	*/
+	// Increment the wood resource count
+	public void incrementWoodResource() {
+	woodResourceCount++;
 	        
-	        // Once 10 wood has been collected notify the player to go to the shop
-	        if (woodResourceCount >= 10) {
-	        	if (simulationGUI != null) {
-	        		simulationGUI.notifyPlayer(); 
-	        	}
-	        }
+	// Once 10 wood has been collected notify the player to go to the shop
+	if (woodResourceCount >= 10) {
+	if (simulationGUI != null) {
+	simulationGUI.notifyPlayer(); 
+	       }
 	    }
+	}
 	    
-	    /** Method decrementWoodResource - This takes one away from the total wood count (for purchasing items etc...)
-	     * 
-	     * @param amount
-	     */
-	    // Decrement the wood resource count
-	    public void decrementWoodResource(int amount) {
-	        woodResourceCount -= amount;
-	        simulationGUI.updateResourceDisplay(); // Automatically update the GUI
-	    }
+	/** Method decrementWoodResource - This takes one away from the total wood count (for purchasing items etc...)
+	 * 
+	 * @param amount
+	 */
+	 // Decrement the wood resource count
+	 public void decrementWoodResource(int amount) {
+	     woodResourceCount -= amount;
+	     simulationGUI.updateResourceDisplay(); // Automatically update the GUI
+	 }
 
-	    /** Getter getWoodResourceCount - Returns the woodResourceCount
-	     * 
-	     * @return - The wood resource count
-	     */
-	    // Get the current wood resource count
-	    public int getWoodResourceCount() {
-	        return woodResourceCount;
-	    }
+	 /** Getter getWoodResourceCount - Returns the woodResourceCount
+	  * 
+	  * @return - The wood resource count
+	  */
+	 // Get the current wood resource count
+	 public int getWoodResourceCount() {
+	     return woodResourceCount;
+	 }
 
 	
 	/** Method clearArena - This clears all the items from the arena

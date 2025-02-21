@@ -92,6 +92,7 @@ public class ShopkeeperNPC extends NPC_Robot {
                 closeButton.setOnAction(e -> {
                     dialog.close();
                     isInteracting = false;
+                    SoundManager.getInstance().playSound("interactShop"); // play the interaction soundd
                 });
 
                 layout.getChildren().addAll(titleLabel, shopkeeperImage, shopGrid, closeButton);

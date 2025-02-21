@@ -193,6 +193,18 @@ public class MyCanvas {
 		gc.fillArc(x,  y, width, height, startAngle, arcExtent, ArcType.ROUND); // draw arc
 	}
 	
+    /**
+     * Method applyLightingOverlay - Applies a semi-transparent dark overlay for night time
+     * 
+     * @param darknessLevel - The intensity of darkness (0.0 to 1.0)
+     */
+    public void applyLightingOverlay(double darknessLevel) {
+        if (darknessLevel > 0) {
+            gc.setFill(new Color(0, 0, 0, darknessLevel));
+            gc.fillRect(0, 0, 800, 600);
+        }
+    }
+	
 	/**
 	 * Method drawKeyIndicator - Draws an "E" key interaction indicator above an NPC
 	 *
